@@ -42,7 +42,7 @@ jobs:
             --region=${{ env.REGION }} \
             --allow-unauthenticated \
             --port=8080 \
-            --set-env-vars="DATABASE_URI=${{ secrets.DATABASE_URI }},JWT_SECRET=dummy_secret"
+            --set-env-vars="DATABASE_URI=${{ secrets.DATABASE_URI }},JWT_SECRET=${{ secrets.JWT_SECRET }}"
 
       - name: Build & Push Client Image
         run: |
