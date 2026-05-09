@@ -50,6 +50,7 @@ jobs:
           docker build \
             --build-arg NEXT_PUBLIC_PAYPAL_CLIENT_ID=dummy_paypal_client \
             --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY }} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
             -t ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA ./client
           docker push ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA
 

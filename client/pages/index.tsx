@@ -36,9 +36,17 @@ export async function getStaticProps() {
   const PAGE = 1;
   const LIMIT = 12;
 
-  const banners = await BannerService.getBanners();
-  const categories = await CategoryService.getCategories();
-  const products = await ProductService.getProducts({ page: PAGE, limit: LIMIT });
+  let banners: any[] = [];
+  let categories: any[] = [];
+  let products: any[] = [];
+
+  try {
+    banners = await BannerService.getBanners();
+    categories = await CategoryService.getCategories();
+    products = await ProductService.getProducts({ page: PAGE, limit: LIMIT });
+  } catch (error) {
+    console.error('Error fetching data during build/ISR:', error);
+  }
 
   return {
     props: {
