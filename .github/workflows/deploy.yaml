@@ -1,0 +1,62 @@
+name: Build & Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.REGION }}
+  REPO_NAME: dress-shop
+  SERVER_IMAGE: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dress-shop/server
+  CLIENT_IMAGE: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dress-shop/client
+
+jobs:
+  build-and-deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build & Push Server Image
+        run: |
+          docker build -t ${{ env.SERVER_IMAGE }}:$GITHUB_SHA ./server
+          docker push ${{ env.SERVER_IMAGE }}:$GITHUB_SHA
+
+      - name: Deploy Server to Cloud Run
+        run: |
+          gcloud run deploy dress-shop-server \
+            --image=${{ env.SERVER_IMAGE }}:$GITHUB_SHA \
+            --region=${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port=8080 \
+            --set-env-vars="DATABASE_URI=${{ secrets.DATABASE_URI }},JWT_SECRET=dummy_secret"
+
+      - name: Build & Push Client Image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_PAYPAL_CLIENT_ID=dummy_paypal_client \
+            --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY }} \
+            -t ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA ./client
+          docker push ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA
+
+      - name: Deploy Client to Cloud Run
+        run: |
+          gcloud run deploy dress-shop-client \
+            --image=${{ env.CLIENT_IMAGE }}:$GITHUB_SHA \
+            --region=${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port=8080 \
+            --set-env-vars="NEXT_PUBLIC_PAYPAL_CLIENT_ID=${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}"
