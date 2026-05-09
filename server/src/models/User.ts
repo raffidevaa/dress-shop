@@ -14,12 +14,12 @@ export interface UserDocument extends Document {
   matchesPassword: (password: string) => Promise<boolean>;
 }
 
-const UserSchema = new Schema(
+const UserSchema = new Schema<UserDocument>(
   {
     name: String,
     email: String,
     imageURL: String,
-    password: String,
+    password: { type: String, select: false },
     role: String,
     googleId: String,
   },
