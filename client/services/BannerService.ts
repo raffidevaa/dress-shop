@@ -4,9 +4,10 @@ import { catchError } from '@/utils/catchError';
 
 const getBanners = async (): Promise<Banner[]> => {
   try {
-    const { data } = await apiClient.get(`/banners`);
+    const { data } = await apiClient.get(`/api/banners`);
     return data.data;
   } catch (error) {
+    console.error('Raw error from API call:', error); // Log the raw error
     throw new Error(catchError(error));
   }
 };

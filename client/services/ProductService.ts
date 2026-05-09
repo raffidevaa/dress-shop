@@ -4,17 +4,18 @@ import { catchError } from '@/utils/catchError';
 
 const getProducts = async (fields: Record<string, any> = {}): Promise<Product[]> => {
   try {
-    const url = `/products`;
+    const url = `/api/products`;
     const { data } = await apiClient.get(url, { params: fields });
     return data.data.products;
   } catch (error) {
+    console.error('Raw error from API call (getProducts):', error);
     throw new Error(catchError(error));
   }
 };
 
 export const getProduct = async (id: string): Promise<ProductData> => {
   try {
-    const url = `/products/${id}`;
+    const url = `/api/products/${id}`;
     const { data } = await apiClient.get(url);
 
     const productData: ProductData = {
@@ -23,6 +24,7 @@ export const getProduct = async (id: string): Promise<ProductData> => {
     };
     return productData;
   } catch (error) {
+    console.error('Raw error from API call (getProduct):', error);
     throw new Error(catchError(error));
   }
 };

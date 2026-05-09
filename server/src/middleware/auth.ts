@@ -6,7 +6,7 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
   return passport.authenticate(
     'jwt',
     { session: false },
-    function (err, user, info) {
+    function (err: Error | null, user: User | false, info: any) {
       if (err) {
         return next(info);
       }

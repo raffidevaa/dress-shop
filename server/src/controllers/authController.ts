@@ -74,7 +74,7 @@ export const login = async (
   passport.authenticate(
     'login',
     { session: false },
-    function (err, user, info) {
+    function (err: Error | null, user: UserDocument | false, info: any) {
       if (err) {
         return next(err);
       }
@@ -96,7 +96,7 @@ export const signUp = async (
   passport.authenticate(
     'signUp',
     { session: false },
-    function (err, user, info) {
+    function (err: Error | null, user: UserDocument | false, info: any) {
       if (err) {
         return next(err);
       }
