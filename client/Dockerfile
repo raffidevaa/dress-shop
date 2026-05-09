@@ -1,7 +1,7 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY . .
 
 ARG NEXT_PUBLIC_PAYPAL_CLIENT_ID
@@ -15,5 +15,5 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 8080
-ENV PORT 8080
+ENV PORT=8080
 CMD ["npm", "start"]
