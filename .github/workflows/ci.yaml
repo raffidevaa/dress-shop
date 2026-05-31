@@ -110,9 +110,14 @@ jobs:
       
       - name: Build and Push Client Docker Image to GCR
         run: |
+          # Fetch secret
+          API_URL=$(gcloud secrets versions access latest --secret="NEXT_PUBLIC_API_URL")
+
           IMAGE_CLIENT=asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client
 
-          docker build -t $IMAGE_CLIENT:${{ github.sha }} -t $IMAGE_CLIENT:latest ./client
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=$API_URL \
+            -t $IMAGE_CLIENT:${{ github.sha }} -t $IMAGE_CLIENT:latest ./client
 
           docker push $IMAGE_CLIENT:${{ github.sha }}
           docker push $IMAGE_CLIENT:latest
