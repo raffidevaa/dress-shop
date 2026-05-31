@@ -1,10 +1,8 @@
 name: Application Deployment
 on:
   push:
-    paths:
-      - 'client/**'
-      - 'server/**'
-      - 'scripts/**'
+    branches:
+      - main
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast2
