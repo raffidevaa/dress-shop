@@ -1,10 +1,10 @@
-import { render as rtlRender } from '@testing-library/react';
+import { render as rtlRender, RenderOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { AppProviders } from '@/contexts/AppProviders';
 
 // eslint-disable-next-line import/export
-export const render = (ui: React.ReactElement, { ...options }: Record<string, any> = {}) => {
+export const render = (ui: React.ReactElement, options: Omit<RenderOptions, 'wrapper'> = {}) => {
   return rtlRender(ui, { wrapper: AppProviders, ...options });
 };
 
