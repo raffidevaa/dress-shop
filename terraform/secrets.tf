@@ -8,5 +8,5 @@ resource "google_secret_manager_secret" "mongodb_uri" {
 resource "google_secret_manager_secret_iam_member" "access" {
   secret_id = google_secret_manager_secret.mongodb_uri.id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 }

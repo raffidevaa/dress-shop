@@ -1,15 +1,16 @@
-variable "project_id" {
+variable "PROJECT_ID" {
   description = "The ID of the project to deploy to"
   type        = string
 }
 
-variable "region" {
+variable "REGION" {
   description = "The region to deploy to"
   type        = string
-  default     = "asia-southeast2"
+  default     = "asia-southeast1"
 }
 
-variable "project_number" {
+variable "PROJECT_NUMBER" {
   description = "The project number for IAM member assignments"
   type        = string
 }
+

@@ -1,5 +1,5 @@
 resource "google_artifact_registry_repository" "dress_shop_repo" {
-  location      = var.region
+  location      = var.REGION
   repository_id = "dress-shop"
   description   = "Docker repository for DRESS SHOP images"
   format        = "DOCKER"

@@ -7,7 +7,7 @@ resource "google_compute_global_address" "default" {
 resource "google_compute_region_network_endpoint_group" "client_neg" {
   name                  = "client-neg"
   network_endpoint_type = "SERVERLESS"
-  region                = var.region
+  region                = var.REGION
   cloud_run {
     service = "dress-shop-client"
   }
@@ -17,11 +17,12 @@ resource "google_compute_region_network_endpoint_group" "client_neg" {
 resource "google_compute_region_network_endpoint_group" "server_neg" {
   name                  = "server-neg"
   network_endpoint_type = "SERVERLESS"
-  region                = var.region
+  region                = var.REGION
   cloud_run {
     service = "dress-shop-server"
   }
 }
+
 
 # URL Map (Routing Logic)
 resource "google_compute_url_map" "default" {
