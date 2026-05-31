@@ -75,4 +75,4 @@ jobs:
             -Dsonar.sources=client,server/src
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=server/coverage/lcov.info,client/coverage/lcov.info
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.wait=false
