@@ -35,7 +35,7 @@ export const update = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ data: user });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in updating user details' });
   }
 };

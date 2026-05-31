@@ -6,6 +6,10 @@ import { User, UserDocument } from '../models';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
+type AuthInfo = {
+  message?: string;
+};
+
 export const sendResponseToken = ({
   user,
   res,
@@ -61,7 +65,7 @@ export const loginViaGoogle = async (req: Request, res: Response) => {
     }
 
     sendResponseToken({ user, res, statusCode: 200 });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in logging in' });
   }
 };
@@ -74,13 +78,15 @@ export const login = async (
   passport.authenticate(
     'login',
     { session: false },
-    function (err: Error | null, user: UserDocument | false, info: any) {
+    function (err: Error | null, user: UserDocument | false, info: AuthInfo) {
       if (err) {
         return next(err);
       }
 
       if (!user) {
-        return res.status(401).json({ message: info.message });
+        return res
+          .status(401)
+          .json({ message: info.message ?? 'Authentication failed' });
       }
 
       sendResponseToken({ user, res, statusCode: 200 });
@@ -96,13 +102,15 @@ export const signUp = async (
   passport.authenticate(
     'signUp',
     { session: false },
-    function (err: Error | null, user: UserDocument | false, info: any) {
+    function (err: Error | null, user: UserDocument | false, info: AuthInfo) {
       if (err) {
         return next(err);
       }
 
       if (!user) {
-        return res.status(401).json({ message: info.message });
+        return res
+          .status(401)
+          .json({ message: info.message ?? 'Authentication failed' });
       }
 
       sendResponseToken({ user, res, statusCode: 201 });
@@ -138,7 +146,7 @@ export const changePassword = async (req: Request, res: Response) => {
     await foundUser.save();
 
     sendResponseToken({ user: foundUser, res, statusCode: 200 });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in updating password.' });
   }
 };

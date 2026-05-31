@@ -9,7 +9,7 @@ export const index = async (req: Request, res: Response) => {
       .populate('items.product')
       .sort('-createdAt');
     res.status(200).json({ data: orders });
-  } catch (error) {
+  } catch {
     return res.status(500).json({ message: 'Error in getting orders' });
   }
 };

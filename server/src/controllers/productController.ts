@@ -16,7 +16,7 @@ export const index = async (req: Request, res: Response) => {
     const total = await features.count().total;
 
     res.status(200).json({ data: { total, count: products.length, products } });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting products' });
   }
 };
@@ -35,7 +35,7 @@ export const show = async (req: Request, res: Response) => {
     }).limit(8);
 
     res.status(200).json({ data: { product, relatedProducts } });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting product' });
   }
 };
@@ -60,7 +60,7 @@ export const store = async (req: Request, res: Response) => {
 
     res.status(200).json({ data: { product } });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error in creating product' });
   }
 };
@@ -68,7 +68,7 @@ export const store = async (req: Request, res: Response) => {
 export const remove = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  let product = await Product.findOne({ _id: id });
+  const product = await Product.findOne({ _id: id });
 
   if (!product) return res.status(404).json({ message: 'Product not found' });
 
@@ -90,7 +90,7 @@ export const update = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ data: { product } });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in creating product' });
   }
 };

@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
@@ -20,7 +20,7 @@ import passport from "passport";
 import bodyParser from "body-parser";
 
 // initialize passport
-require("./lib/passport");
+import "./lib/passport";
 
 const app = express();
 

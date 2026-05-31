@@ -105,7 +105,7 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
   if (errors.isEmpty()) {
     return next();
   }
-  const extractedErrors: Object[] = [];
+  const extractedErrors: object[] = [];
   errors.array().map((err) => extractedErrors.push({ [err.param]: err.msg }));
 
   return res.status(422).json({

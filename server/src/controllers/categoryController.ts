@@ -5,7 +5,7 @@ export const index = async (req: Request, res: Response) => {
   try {
     const categories = await Category.find();
     res.status(200).json({ data: categories });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting categories' });
   }
 };

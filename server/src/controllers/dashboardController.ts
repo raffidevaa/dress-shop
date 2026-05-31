@@ -7,7 +7,7 @@ export const index = async (req: Request, res: Response) => {
     const users = await User.find().countDocuments();
     const orders = await Order.find().countDocuments();
     res.status(200).json({ data: { products, users, orders } });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting dashboard' });
   }
 };
