@@ -9,7 +9,7 @@ export const index = async (req: Request, res: Response) => {
       'product'
     );
     res.status(200).json({ data: wishlist });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting wishlist' });
   }
 };
@@ -33,7 +33,7 @@ export const store = async (req: Request, res: Response) => {
     wishlist = await wishlist.populate('product').execPopulate();
 
     res.status(200).json({ data: wishlist });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in adding wishlist' });
   }
 };
@@ -42,7 +42,7 @@ export const destroy = async (req: Request, res: Response) => {
   try {
     const user = req.user as UserTypes;
     const { productId } = req.body;
-    let wishlist = await Wishlist.findOne({
+    const wishlist = await Wishlist.findOne({
       user: user._id,
       product: productId,
     });
@@ -56,7 +56,7 @@ export const destroy = async (req: Request, res: Response) => {
     await wishlist.remove();
 
     res.status(200).json({ data: null });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in adding wishlist' });
   }
 };

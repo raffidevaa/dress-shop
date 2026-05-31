@@ -1,64 +1,78 @@
-name: Build & Deploy to Cloud Run
-
+name: Application Deployment
 on:
   push:
-    branches: [main]
-
+    branches:
+      - main
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: ${{ secrets.REGION }}
-  REPO_NAME: dress-shop
-  SERVER_IMAGE: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dress-shop/server
-  CLIENT_IMAGE: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dress-shop/client
-
+  REGION: asia-southeast2
+  ARTIFACT_REPO: dress-shop-repo
 jobs:
-  build-and-deploy:
-    name: Build, Push, and Deploy
+  # Step 1: Install Dependencies and Code Quality Check (Linting)
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Server Dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Lint Server
+        working-directory: ./server
+        run: npm run lint
+
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
+
+      - name: Lint Client
+        working-directory: ./client
+        run: npm run lint
+
+  # Step 2: Jest Unit Tests
+  jest-test:
+    needs: code-quality
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Google Auth
-        uses: google-github-actions/auth@v2
+      - uses: actions/checkout@v4
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
+      - name: Run Jest (client)
+        working-directory: ./client
+        run: npm run test -- --coverage --coverageReporters=lcov --watchAll=false --forceExit
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          name: coverage-reports
+          path: |
+            server/coverage/lcov.info
+            client/coverage/lcov.info
 
-      - name: Setup Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Build & Push Server Image
-        run: |
-          docker build -t ${{ env.SERVER_IMAGE }}:$GITHUB_SHA ./server
-          docker push ${{ env.SERVER_IMAGE }}:$GITHUB_SHA
-
-      - name: Deploy Server to Cloud Run
-        run: |
-          gcloud run deploy dress-shop-server \
-            --project=${{ env.PROJECT_ID }} \
-            --image=${{ env.SERVER_IMAGE }}:$GITHUB_SHA \
-            --region=${{ env.REGION }} \
-            --allow-unauthenticated \
-            --port=8080 \
-            --set-env-vars="DATABASE_URI=${{ secrets.DATABASE_URI }},JWT_SECRET=${{ secrets.JWT_SECRET }},GCP_PROJECT_ID=${{ env.PROJECT_ID }}"
-
-      - name: Build & Push Client Image
-        run: |
-          docker build \
-            --build-arg NEXT_PUBLIC_PAYPAL_CLIENT_ID=dummy_paypal_client \
-            --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KY }} \
-            --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
-            -t ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA ./client
-          docker push ${{ env.CLIENT_IMAGE }}:$GITHUB_SHA
-
-      - name: Deploy Client to Cloud Run
-        run: |
-          gcloud run deploy dress-shop-client \
-            --image=${{ env.CLIENT_IMAGE }}:$GITHUB_SHA \
-            --region=${{ env.REGION }} \
-            --allow-unauthenticated \
-            --port=8080 \
-            --set-env-vars="NEXT_PUBLIC_PAYPAL_CLIENT_ID=${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}"
+  # Step 3: SonarCloud Analysis
+  sonarcloud:
+    needs: jest-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+      - name: Scan with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION_KEY }}
+            -Dsonar.sources=client,server/src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=server/coverage/lcov.info,client/coverage/lcov.info
+            -Dsonar.qualitygate.wait=false

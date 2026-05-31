@@ -1,9 +1,34 @@
 import { Request, Response } from 'express';
 import { Cart, Order } from '../models';
-import { User as UserType } from '../types';
+import { Product as ProductType, User as UserType } from '../types';
 import { createPaymentIntent } from '../lib/stripe';
 import { client } from '../lib/paypal';
-const paypal = require('@paypal/checkout-server-sdk');
+import * as paypal from '@paypal/checkout-server-sdk';
+
+type PopulatedCartItem = {
+  product: ProductType;
+  quantity: number;
+};
+
+type PaypalCreateOrderResponse = {
+  result: {
+    id: string;
+  };
+};
+
+type PaypalCaptureResponse = {
+  result: {
+    purchase_units: Array<{
+      payments: {
+        captures: Array<{
+          amount: {
+            value: number;
+          };
+        }>;
+      };
+    }>;
+  };
+};
 
 const getCart = async (req: Request) => {
   const user = req.user as UserType;
@@ -12,11 +37,12 @@ const getCart = async (req: Request) => {
 
 const calculateCartTotal = async (req: Request) => {
   const cart = await getCart(req);
-  const total = cart?.items.reduce(
-    (acc: any, el: any) => acc + el.product.price * el.quantity,
+  const total = cart?.items.reduce<number>(
+    (acc, item) =>
+      acc + (item as unknown as PopulatedCartItem).product.price * item.quantity,
     0
   );
-  return total;
+  return total ?? 0;
 };
 
 const createOrder = async (
@@ -48,7 +74,7 @@ export const createStripeCharge = async (req: Request, res: Response) => {
     await createPaymentIntent(totalAmount, paymentMethodId);
     const order = await createOrder(user._id, totalAmount, 'stripe');
     res.status(200).json({ data: order });
-  } catch (error) {
+  } catch {
     res
       .status(500)
       .send({ message: 'Unexpected error occured. Please try again later.' });
@@ -73,8 +99,8 @@ export const createPaypalTransaction = async (req: Request, res: Response) => {
 
   let order;
   try {
-    order = await client().execute(request);
-  } catch (err) {
+    order = (await client().execute(request)) as PaypalCreateOrderResponse;
+  } catch {
     return res
       .status(500)
       .send({ message: 'Unexpected error occured. Please try again later.' });
@@ -96,12 +122,12 @@ export const capturePaypalTransaction = async (req: Request, res: Response) => {
   request.requestBody({});
 
   try {
-    const capture = await client().execute(request);
+    const capture = (await client().execute(request)) as PaypalCaptureResponse;
     const amount =
       capture.result.purchase_units[0].payments.captures[0].amount.value;
 
     await createOrder(user._id, amount, 'paypal');
-  } catch (err) {
+  } catch {
     return res.send(500);
   }
 

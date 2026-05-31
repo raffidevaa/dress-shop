@@ -1,7 +1,6 @@
 import { rest } from 'msw';
 import { setCookie, destroyCookie } from 'nookies';
 
-import { API_URL } from '@/constants';
 import { fakeCartItems } from '@/test/fake-data';
 import { server } from '@/test/server';
 import { render, screen, waitForElementToBeRemoved, within } from '@/test/test-utils';
@@ -46,7 +45,7 @@ test('successfully fetched cart items and renders correctly', async () => {
 
 test('show error message on failure fetching cart items', async () => {
   server.use(
-    rest.get(`${API_URL}/cart`, (_, res, ctx) => {
+    rest.get(/.*\/cart$/, (_, res, ctx) => {
       return res(ctx.status(500));
     })
   );

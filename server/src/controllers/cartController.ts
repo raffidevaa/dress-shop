@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Cart, User } from '../models';
+import { Cart } from '../models';
 import { User as UserTypes } from '../types';
 import mongoose from 'mongoose';
 
@@ -13,7 +13,7 @@ export const index = async (req: Request, res: Response) => {
       .sort('-createdAt');
 
     res.status(200).json({ data: cart });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting cart' });
   }
 };
@@ -62,7 +62,7 @@ export const store = async (req: Request, res: Response) => {
     );
 
     res.status(200).json({ data: cartItem });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in creating cart' });
   }
 };
@@ -84,7 +84,7 @@ export const remove = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ data: cart?.items });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in removing cart' });
   }
 };
@@ -95,7 +95,7 @@ export const update = async (req: Request, res: Response) => {
 
     const { productId, quantity } = req.body;
 
-    let cart = await Cart.findOneAndUpdate(
+    const cart = await Cart.findOneAndUpdate(
       { user: user._id, 'items.product': productId },
       { $set: { 'items.$.quantity': quantity } },
       { new: true }
@@ -114,7 +114,7 @@ export const update = async (req: Request, res: Response) => {
     );
 
     return res.status(200).json({ data: cartItem });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting product' });
   }
 };

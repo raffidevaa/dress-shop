@@ -1,23 +1,29 @@
-class APIFeatures {
-  query: any;
-  queryString: any;
-  total: number;
-  model: any;
+import { Document, FilterQuery, Model, Query } from 'mongoose';
 
-  constructor(query: any, model: any, queryString: any) {
+type QueryString = Record<string, unknown>;
+
+class APIFeatures<T extends Document> {
+  query: Query<T[], T>;
+  queryString: QueryString;
+  total: number | PromiseLike<number>;
+  model: Model<T>;
+  filterQuery: FilterQuery<T>;
+
+  constructor(query: Query<T[], T>, model: Model<T>, queryString: QueryString) {
     this.query = query;
     this.queryString = queryString;
     this.total = 0;
     this.model = model;
+    this.filterQuery = {};
   }
 
   filter() {
-    let queryObj = { ...this.queryString };
+    let queryObj: Record<string, unknown> = { ...this.queryString };
     const excludedFields = ["page", "sort", "limit", "fields", "keyword"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     // keyword
-    if (this.queryString.keyword) {
+    if (typeof this.queryString.keyword === "string") {
       queryObj = { ...queryObj, $text: { $search: this.queryString.keyword } };
     }
 
@@ -26,20 +32,19 @@ class APIFeatures {
 
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    this.query = this.query.find(JSON.parse(queryStr));
-
-    this.model = this.model.find(JSON.parse(queryStr));
+    this.filterQuery = JSON.parse(queryStr) as FilterQuery<T>;
+    this.query = this.query.find(this.filterQuery);
 
     return this;
   }
 
   count() {
-    this.total = this.model.countDocuments();
+    this.total = this.model.countDocuments(this.filterQuery);
     return this;
   }
 
   sort() {
-    if (this.queryString.sort) {
+    if (typeof this.queryString.sort === "string") {
       const sortBy = this.queryString.sort.split(",").join(" ");
       this.query = this.query.sort(sortBy);
     } else {
@@ -50,7 +55,7 @@ class APIFeatures {
   }
 
   limitFields() {
-    if (this.queryString.fields) {
+    if (typeof this.queryString.fields === "string") {
       const fields = this.queryString.fields.split(",").join(" ");
       this.query = this.query.select(fields);
     } else {
@@ -60,8 +65,14 @@ class APIFeatures {
   }
 
   paginate() {
-    const page = this.queryString.page * 1 || 1;
-    const limit = this.queryString.limit * 1 || 20;
+    const page =
+      typeof this.queryString.page === "string"
+        ? Number(this.queryString.page)
+        : 1;
+    const limit =
+      typeof this.queryString.limit === "string"
+        ? Number(this.queryString.limit)
+        : 20;
     const skip = (page - 1) * limit;
     this.query = this.query.skip(skip).limit(limit);
 

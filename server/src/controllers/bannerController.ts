@@ -5,7 +5,7 @@ export const index = async (req: Request, res: Response) => {
   try {
     const banners = await Banner.find();
     res.status(200).json({ data: banners });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error in getting banners' });
   }
 };
