@@ -72,8 +72,8 @@ jobs:
           args: >
             -Dsonar.projectKey=raffi_devaa_dress-shop
             -Dsonar.organization=raffi_devaa
-            -Dsonar.sources=client/src,server/src
-            -Dsonar.tests=client/src,server/src
+            -Dsonar.sources=client/,server/src/
+            -Dsonar.tests=client/test
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=server/coverage/lcov.info,client/coverage/lcov.info
             -Dsonar.qualitygate.wait=true
