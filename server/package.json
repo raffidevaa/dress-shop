@@ -47,6 +47,7 @@
     "@types/passport-google-oauth20": "^2.0.3",
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
+    "@types/paypal__checkout-server-sdk": "^1.0.8",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "jest": "^30.4.2",

@@ -8,3 +8,4 @@ export * from './orderRoutes';
 export * from './userRoutes';
 export * from './dashboardRoutes';
 export * from './wishlistRoutes';
+export * from './healthRoutes';

@@ -14,6 +14,7 @@ import {
   userRoutes,
   dashboardRoutes,
   wishlistRoutes,
+  healthRoutes,
 } from "./routes";
 import { PORT } from "./config";
 import passport from "passport";
@@ -33,6 +34,7 @@ const start = async () => {
   app.use(passport.initialize());
 
   // setup routes
+  app.use("/api/health", healthRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/banners", bannerRoutes);
   app.use("/api/categories", categoryRoutes);

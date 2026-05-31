@@ -1,8 +1,8 @@
 import * as checkoutNodeJssdk from '@paypal/checkout-server-sdk';
 
 const environment = () => {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+  const clientId = process.env.PAYPAL_CLIENT_ID!;
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET!;
 
   // for production
   //   if (process.env.NODE_ENV === 'production') {
