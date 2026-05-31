@@ -52,3 +52,30 @@ jobs:
           path: |
             server/coverage/lcov.info
             client/coverage/lcov.info
+
+  # Step 3: SonarCloud Analysis
+  sonarcloud:
+    needs: jest-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+      - name: Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=raffi_devaa_dress-shop
+            -Dsonar.organization=raffi_devaa
+            -Dsonar.sources=client/src,server/src
+            -Dsonar.tests=client/src,server/src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=server/coverage/lcov.info,client/coverage/lcov.info
+            -Dsonar.qualitygate.wait=true
