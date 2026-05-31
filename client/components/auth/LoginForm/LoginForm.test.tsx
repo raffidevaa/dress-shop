@@ -32,6 +32,7 @@ describe('<LoginForm />', () => {
       userEvent.click(submitButton);
     });
 
+    // Wait for the final observable effect instead of transient disabled states
     await waitFor(() => expect(Router.push).toBeCalledWith('/profile'));
   });
 
