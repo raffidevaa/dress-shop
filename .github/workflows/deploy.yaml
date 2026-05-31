@@ -101,7 +101,7 @@ jobs:
 
       - name: Build and Push Server Docker Image to GCR
         run: |
-          IMAGE_SERVER=gcr.io/${{ env.PROJECT_ID }}/dress-shop-server
+          IMAGE_SERVER=dress-shop/${{ env.PROJECT_ID }}/server
 
           docker build -t $IMAGE_SERVER:${{ github.sha }} -t $IMAGE_SERVER:latest ./server
 
@@ -110,7 +110,7 @@ jobs:
       
       - name: Build and Push Client Docker Image to GCR
         run: |
-          IMAGE_CLIENT=gcr.io/${{ env.PROJECT_ID }}/dress-shop-client
+          IMAGE_CLIENT=dress-shop/${{ env.PROJECT_ID }}/client
 
           docker build -t $IMAGE_CLIENT:${{ github.sha }} -t $IMAGE_CLIENT:latest ./client
 
