@@ -1,4 +1,4 @@
-name: Application Deployment
+name: CI — Code Quality, Tests, and SonarCloud Analysis
 on:
   push:
     branches:
@@ -76,3 +76,44 @@ jobs:
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=server/coverage/lcov.info,client/coverage/lcov.info
             -Dsonar.qualitygate.wait=false
+  
+  # Step 4: Build and Push Docker Image to GCR
+  build-and-push:
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_CREDENTIALS }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push Server Docker Image to GCR
+        run: |
+          IMAGE_SERVER=gcr.io/${{ env.PROJECT_ID }}/dress-shop-server
+
+          docker build -t $IMAGE_SERVER:${{ github.sha }} -t $IMAGE_SERVER:latest ./server
+
+          docker push $IMAGE_SERVER:${{ github.sha }}
+          docker push $IMAGE_SERVER:latest
+      
+      - name: Build and Push Client Docker Image to GCR
+        run: |
+          IMAGE_CLIENT=gcr.io/${{ env.PROJECT_ID }}/dress-shop-client
+
+          docker build -t $IMAGE_CLIENT:${{ github.sha }} -t $IMAGE_CLIENT:latest ./client
+
+          docker push $IMAGE_CLIENT:${{ github.sha }}
+          docker push $IMAGE_CLIENT:latest
