@@ -10,15 +10,45 @@ env:
   REGION: asia-southeast2
   ARTIFACT_REPO: dress-shop-repo
 jobs:
+  # Step 1: Install Dependencies and Code Quality Check (Linting)
+  code-quality:
+    runs-on: ubuntu-latest
 
-  # Quality Gate
-  # Step 1: Install dependencies and linting
-  ci-test:
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Server Dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Lint Server
+        working-directory: ./server
+        run: npm run lint
+
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
+
+      - name: Lint Client
+        working-directory: ./client
+        run: npm run lint
+
+  # Step 2: Jest Unit Tests
+  jest-test:
+    needs: code-quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install & Lint
-        run: |
-          cd server && npm install && npm run lint
-          cd ../client && npm install --legacy-peer-deps && npm run lint
-    
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
+      - name: Run Jest (client)
+        working-directory: ./client
+        run: npm run test -- --coverage --coverageReporters=lcov --watchAll=false --forceExit
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            server/coverage/lcov.info
+            client/coverage/lcov.info

@@ -9,7 +9,8 @@
     "start": "npm run build && node ./build/index.js",
     "seed": "ts-node temp/seed.ts",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -48,6 +49,7 @@
     "@types/passport-local": "^1.0.33",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
+    "jest": "^30.4.2",
     "jiti": "^2.7.0",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
