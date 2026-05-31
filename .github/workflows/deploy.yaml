@@ -97,7 +97,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker --quiet
+        run: gcloud auth configure-docker --quiet \
+             asia-southeast1-docker.pkg.dev
 
       - name: Build and Push Server Docker Image to GCR
         run: |
