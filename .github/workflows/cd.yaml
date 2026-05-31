@@ -48,6 +48,7 @@ jobs:
             --min-instances 0 \
             --max-instances 10 \
             --set-env-vars NODE_ENV=production \
+            --set-env-vars DATABASE_URI=${{ secrets.DATABASE_URI }} \
             --quiet
 
       - name: Verify client image exists in GCR
@@ -75,7 +76,7 @@ jobs:
           gcloud run services describe ${{ env.SERVICE_NAME }}-server \
             --region ${{ env.REGION }} \
             --format "value(status.url)"
-            
+
           gcloud run services describe ${{ env.SERVICE_NAME }}-client \
             --region ${{ env.REGION }} \
             --format "value(status.url)"
