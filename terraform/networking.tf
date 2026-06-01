@@ -64,6 +64,11 @@ resource "google_compute_url_map" "url_map" {
   }
 }
 
+# Static IP for Load Balancer
+resource "google_compute_global_address" "default" {
+  name = "dress-shop-ip"
+}
+
 # HTTP Proxy & Forwarding Rule
 resource "google_compute_target_https_proxy" "https_proxy" {
   name             = "dress-shop-https-proxy"
@@ -74,5 +79,6 @@ resource "google_compute_target_https_proxy" "https_proxy" {
 resource "google_compute_global_forwarding_rule" "default" {
   name       = "dress-shop-forwarding-rule"
   target     = google_compute_target_https_proxy.https_proxy.id
+  ip_address = google_compute_global_address.default.id
   port_range = "443"
 }
