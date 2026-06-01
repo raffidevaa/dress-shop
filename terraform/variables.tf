@@ -14,3 +14,8 @@ variable "PROJECT_NUMBER" {
   type        = string
 }
 
+variable "DOMAIN" {
+  description = "Domain name for SSL"
+  type        = string
+}
+
