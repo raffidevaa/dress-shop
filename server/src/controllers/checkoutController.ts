@@ -119,6 +119,7 @@ export const capturePaypalTransaction = async (req: Request, res: Response) => {
 
   // 3. Call PayPal to capture the order
   const request = new paypal.orders.OrdersCaptureRequest(orderID);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   request.requestBody({} as any);
 
   try {
