@@ -119,7 +119,7 @@ export const capturePaypalTransaction = async (req: Request, res: Response) => {
 
   // 3. Call PayPal to capture the order
   const request = new paypal.orders.OrdersCaptureRequest(orderID);
-  request.requestBody({});
+  request.requestBody({} as any);
 
   try {
     const capture = (await client().execute(request)) as PaypalCaptureResponse;
