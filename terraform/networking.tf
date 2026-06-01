@@ -28,16 +28,16 @@ resource "google_compute_region_network_endpoint_group" "server_neg" {
 
 # Backend Service
 resource "google_compute_backend_service" "client_backend" {
-  name        = "client-backend"
-  protocol    = "HTTP"
+  name     = "client-backend"
+  protocol = "HTTP"
   backend {
     group = google_compute_region_network_endpoint_group.client_neg.id
   }
 }
 
 resource "google_compute_backend_service" "server_backend" {
-  name        = "server-backend"
-  protocol    = "HTTP"
+  name     = "server-backend"
+  protocol = "HTTP"
   backend {
     group = google_compute_region_network_endpoint_group.server_neg.id
   }
@@ -49,7 +49,7 @@ resource "google_compute_url_map" "url_map" {
   default_service = google_compute_backend_service.client_backend.id
 
   host_rule {
-    hosts = ["*"]
+    hosts        = ["*"]
     path_matcher = "allpaths"
   }
 
