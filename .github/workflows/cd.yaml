@@ -1,11 +1,10 @@
 name: CD — Direct Deploy to Cloud Run
 
 on:
-  workflow_dispatch:
   workflow_run:
-      workflows: ["CI — Code Quality, Tests, and SonarCloud Analysis"]
-      types:
-        - completed
+    workflows: ["CI — Code Quality, Tests, and SonarCloud Analysis"]
+    types:
+      - completed
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -22,6 +21,9 @@ jobs:
       id-token: write
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -80,3 +82,15 @@ jobs:
           gcloud run services describe ${{ env.SERVICE_NAME }}-client \
             --region ${{ env.REGION }} \
             --format "value(status.url)"
+
+      - name: Deploy Discord Bridge Cloud Function
+        run: |
+          gcloud functions deploy discord-bridge \
+            --gen2 \
+            --runtime=nodejs22 \
+            --region=${{ env.REGION }} \
+            --source=server/functions/discord-bridge \
+            --entry-point=discordBridge \
+            --trigger-http \
+            --allow-unauthenticated \
+            --set-secrets="DISCORD_WEBHOOK_ALERTS=DISCORD_WEBHOOK_ALERTS:latest,DISCORD_WEBHOOK_ERRORS=DISCORD_WEBHOOK_ERRORS:latest,DISCORD_WEBHOOK_UPTIME=DISCORD_WEBHOOK_UPTIME:latest"
