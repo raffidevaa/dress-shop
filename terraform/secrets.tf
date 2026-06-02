@@ -23,3 +23,12 @@ resource "google_secret_manager_secret_iam_member" "api_url_access" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 }
+
+# Secret Manager for Webhook URL
+resource "google_secret_manager_secret" "discord_webhooks" {
+  for_each  = toset(["alerts", "errors", "uptime"])
+  secret_id = "DISCORD_WEBHOOK_${upper(each.key)}"
+  replication {
+    auto {}
+  }
+}
