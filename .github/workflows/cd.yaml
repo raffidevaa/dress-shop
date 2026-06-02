@@ -1,7 +1,6 @@
 name: CD — Direct Deploy to Cloud Run
 
 on:
-  workflow_dispatch:
   workflow_run:
     workflows: ["CI — Code Quality, Tests, and SonarCloud Analysis"]
     types:
