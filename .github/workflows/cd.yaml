@@ -94,3 +94,33 @@ jobs:
             --trigger-http \
             --allow-unauthenticated \
             --set-secrets="DISCORD_WEBHOOK_ALERTS=DISCORD_WEBHOOK_ALERTS:latest,DISCORD_WEBHOOK_ERRORS=DISCORD_WEBHOOK_ERRORS:latest,DISCORD_WEBHOOK_UPTIME=DISCORD_WEBHOOK_UPTIME:latest"
+  
+  # Post-Deployment Tests
+  post-deploy-test:
+    name: Post-Deployment Tests
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 Smoke Tests
+        run: k6 run ./k6/smoke-test.js
+        env:
+          BASE_URL: http://localhost:8080
+
+      # Setup Node for Cypress
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Install Client Dependencies
+      - name: Install Client Dependencies
+        run: npm install --prefix client
+
+      # Run Cypress E2E Test
+      - name: Run Cypress E2E Tests
+        run: npx cypress run --project client
