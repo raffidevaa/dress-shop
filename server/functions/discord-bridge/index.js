@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const WEBHOOK_MAP = {
   alerts: process.env.DISCORD_WEBHOOK_ALERTS,
@@ -6,7 +6,7 @@ const WEBHOOK_MAP = {
   uptime: process.env.DISCORD_WEBHOOK_UPTIME
 };
 
-exports.discordBridge = async (req, res) => {
+export const discordBridge = async (req, res) => {
   const channel = req.query.channel;
   const webhookUrl = WEBHOOK_MAP[channel];
 
