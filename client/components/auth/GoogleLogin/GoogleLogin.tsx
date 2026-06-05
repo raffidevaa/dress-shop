@@ -1,69 +1,53 @@
+import { useGoogleLogin } from '@react-oauth/google';
 import Router, { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { GoogleLogin as GoogleLoginLib } from 'react-google-login';
 
 import { IconGoogle } from '@/components/icons';
 import { Button, PageLoader } from '@/components/ui';
-import { GOOGLE_CLIENT_ID } from '@/constants';
 import { useToast } from '@/contexts';
-import { useGoogleLogin } from '@/hooks/useAuth';
-
-interface GoogleError {
-  error: string;
-  details: string;
-}
+import { useGoogleLogin as useAuthGoogleLogin } from '@/hooks/useAuth';
 
 const GoogleLogin = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const googleLogin = useGoogleLogin();
+  const authGoogleLogin = useAuthGoogleLogin();
   const { setToast } = useToast();
   const { query } = useRouter();
   const ref = query.ref as string;
 
-  const handleOnSuccess = async (response: any): Promise<void> => {
+  const handleOnSuccess = async (idToken?: string): Promise<void> => {
+    if (!idToken) return;
     try {
       setIsLoggingIn(true);
-      const tokenId = response.tokenId;
-      await googleLogin(tokenId);
+      await authGoogleLogin(idToken);
       setIsLoggingIn(false);
       if (ref) {
         Router.push(`/products/${ref}`);
       } else {
         Router.push('/profile');
       }
-    } catch (error) {
+    } catch (error: any) {
       setToast('error', error.message);
     } finally {
       setIsLoggingIn(false);
     }
   };
 
-  const handleOnFailure = (response: GoogleError) => {
-    if (response.error === 'popup_closed_by_user') return;
-    setToast('error', response.details);
-  };
+  const login = useGoogleLogin({
+    onSuccess: (credentialResponse: any) => handleOnSuccess(credentialResponse.credential),
+    onError: () => setToast('error', 'Login Failed'),
+  });
 
   return (
     <>
       {isLoggingIn && <PageLoader />}
       <div className="container">
-        <GoogleLoginLib
-          clientId={GOOGLE_CLIENT_ID}
-          buttonText="Login"
-          onSuccess={handleOnSuccess}
-          onFailure={handleOnFailure}
-          cookiePolicy={'single_host_origin'}
-          render={(renderProps) => (
-            <Button
-              type="button"
-              onClick={renderProps.onClick}
-              disabled={renderProps.disabled}
-              icon={<IconGoogle />}
-              title="Login with Google"
-              variant="light"
-              style={{ width: '100%' }}
-            />
-          )}
+        <Button
+          type="button"
+          onClick={() => login()}
+          icon={<IconGoogle />}
+          title="Login with Google"
+          variant="light"
+          style={{ width: '100%' }}
         />
       </div>
     </>

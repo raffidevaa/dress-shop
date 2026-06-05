@@ -67,7 +67,7 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
         if (!user) {
           return done(null, false, {
             message: 'Email or Password is incorrect',

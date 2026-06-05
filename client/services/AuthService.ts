@@ -21,7 +21,7 @@ interface UserFields {
 
 const getMe = async (): Promise<UserData> => {
   try {
-    const { data } = await apiClient.get(`/auth/me`);
+    const { data } = await apiClient.get(`api/auth/me`);
 
     const userData: UserData = {
       token: data.data.token,
@@ -36,7 +36,7 @@ const getMe = async (): Promise<UserData> => {
 
 const verifyGoogleIdToken = async (idToken: string): Promise<UserData> => {
   try {
-    const url = `/auth/google`;
+    const url = `api/auth/google`;
     const { data } = await apiClient.post(url, { idToken });
     const userData: UserData = {
       user: data.data.user,
@@ -50,7 +50,7 @@ const verifyGoogleIdToken = async (idToken: string): Promise<UserData> => {
 
 const login = async (email: string, password: string): Promise<UserData> => {
   try {
-    const url = `/auth/login`;
+    const url = `api/auth/login`;
     const { data } = await apiClient.post(url, { email, password });
     const userData: UserData = {
       user: data.data.user,
@@ -72,7 +72,7 @@ const signUp = async ({
   name: string;
 }): Promise<UserData> => {
   try {
-    const url = `/auth/signUp`;
+    const url = `api/auth/signup`;
     const { data } = await apiClient.post(url, { email, password, name });
     const userData: UserData = {
       user: data.data.user,
@@ -86,7 +86,7 @@ const signUp = async ({
 
 export const changePassword = async (passwordFields: UserPasswordData): Promise<UserData> => {
   try {
-    const url = `/auth/change-password`;
+    const url = `api/auth/change-password`;
     const { data } = await apiClient.patch(url, passwordFields);
     const userData: UserData = {
       user: data.data.user,
@@ -100,7 +100,7 @@ export const changePassword = async (passwordFields: UserPasswordData): Promise<
 
 export const updateProfile = async (userId: string, userFields: UserFields): Promise<User> => {
   try {
-    const url = `/users/${userId}`;
+    const url = `api/users/${userId}`;
     const { data } = await apiClient.patch(url, userFields);
 
     return data.data;

@@ -7,10 +7,13 @@ const instance = axios.create({
   baseURL: API_URL,
 });
 
-const { token } = parseCookies({});
-
-if (token) {
-  instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-}
+// Use interceptor to ensure token is retrieved from cookies on every request
+instance.interceptors.request.use((config) => {
+  const { token } = parseCookies({});
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default instance;
