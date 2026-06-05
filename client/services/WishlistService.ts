@@ -4,7 +4,7 @@ import { catchError } from '@/utils/catchError';
 
 const getWishlist = async (): Promise<WishlistItem[]> => {
   try {
-    const { data } = await apiClient.get('/wishlist');
+    const { data } = await apiClient.get('api/wishlist');
     return data.data;
   } catch (error) {
     throw new Error(catchError(error));
@@ -13,7 +13,7 @@ const getWishlist = async (): Promise<WishlistItem[]> => {
 
 const addWishlistItem = async (productId: string): Promise<WishlistItem> => {
   try {
-    const { data } = await apiClient.post('/wishlist', { productId });
+    const { data } = await apiClient.post('api/wishlist', { productId });
     return data.data;
   } catch (error) {
     throw new Error(catchError(error));
@@ -22,7 +22,7 @@ const addWishlistItem = async (productId: string): Promise<WishlistItem> => {
 
 const removeWishlistItem = async (productId: string): Promise<void> => {
   try {
-    return await apiClient.delete('/wishlist', { data: { productId } });
+    return await apiClient.delete('api/wishlist', { data: { productId } });
   } catch (error) {
     throw new Error(catchError(error));
   }

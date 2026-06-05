@@ -4,7 +4,7 @@ import { catchError } from '@/utils/catchError';
 
 const getCart = async (): Promise<Cart> => {
   try {
-    const { data } = await apiClient.get(`/cart`);
+    const { data } = await apiClient.get(`api/cart`);
     return data.data;
   } catch (error) {
     throw new Error(catchError(error));
@@ -13,7 +13,7 @@ const getCart = async (): Promise<Cart> => {
 
 const addCartItem = async (productId: string, quantity: number): Promise<CartItem> => {
   try {
-    const url = `/cart`;
+    const url = `api/cart`;
     const payload = { quantity, productId };
     const { data } = await apiClient.post(url, payload);
     return data.data;
@@ -24,7 +24,7 @@ const addCartItem = async (productId: string, quantity: number): Promise<CartIte
 
 const removeCartItem = async (productId: string): Promise<void> => {
   try {
-    return await apiClient.delete('/cart', { data: { productId } });
+    return await apiClient.delete('api/cart', { data: { productId } });
   } catch (error) {
     throw new Error(catchError(error));
   }
@@ -32,7 +32,7 @@ const removeCartItem = async (productId: string): Promise<void> => {
 
 const updateQuantityCarItem = async (productId: string, quantity: number): Promise<void> => {
   try {
-    return await apiClient.put('/cart', { productId, quantity });
+    return await apiClient.put('api/cart', { productId, quantity });
   } catch (error) {
     throw new Error(catchError(error));
   }

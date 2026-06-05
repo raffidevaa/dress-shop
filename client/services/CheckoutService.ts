@@ -7,7 +7,7 @@ interface PaypalTransaction {
 
 export const stripeCharge = async (paymentMethodId: string) => {
   try {
-    const url = `/checkout/create-stripe-charge`;
+    const url = `api/checkout/create-stripe-charge`;
     const { data } = await apiClient.post(url, { paymentMethodId });
     return data.data;
   } catch (error) {
@@ -17,7 +17,7 @@ export const stripeCharge = async (paymentMethodId: string) => {
 
 export const createPaypalTransaction = async (): Promise<PaypalTransaction> => {
   try {
-    const url = `/checkout/create-paypal-transaction`;
+    const url = `api/checkout/create-paypal-transaction`;
     const { data } = await apiClient.post(url);
 
     const paypalTransaction: PaypalTransaction = {
@@ -32,7 +32,7 @@ export const createPaypalTransaction = async (): Promise<PaypalTransaction> => {
 
 export const capturePaypalTransaction = async (orderID: string): Promise<void> => {
   try {
-    const url = `/checkout/capture-paypal-transaction`;
+    const url = `api/checkout/capture-paypal-transaction`;
     return await apiClient.post(url, { orderID });
   } catch (error) {
     throw new Error(catchError(error));
