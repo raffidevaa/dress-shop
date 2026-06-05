@@ -34,3 +34,19 @@ resource "google_secret_manager_secret" "discord_webhooks" {
     auto {}
   }
 }
+
+# Secret Manager for Google OAuth
+resource "google_secret_manager_secret" "google_secrets" {
+  for_each  = toset(["web_client_id", "client_secret"])
+  secret_id = "GOOGLE_${upper(each.key)}"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "google_access" {
+  for_each  = toset(["web_client_id", "client_secret"])
+  secret_id = google_secret_manager_secret.google_secrets[each.key].id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+}

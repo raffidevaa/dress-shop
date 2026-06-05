@@ -50,7 +50,7 @@ jobs:
             --min-instances 0 \
             --max-instances 10 \
             --set-env-vars NODE_ENV=production \
-            --set-secrets=DATABASE_URI=DATABASE_URI:latest \
+            --set-secrets=DATABASE_URI=DATABASE_URI:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest \
             --quiet
 
       - name: Verify client image exists in GCR
