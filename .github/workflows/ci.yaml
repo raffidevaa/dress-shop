@@ -1,27 +1,31 @@
 name: CI — Code Quality, Tests, and SonarCloud Analysis
+
 on:
   push:
     branches:
       - main
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast1
   ARTIFACT_REPO: dress-shop-repo
+
 jobs:
   # Install Dependencies and Code Quality Check (Linting)
-  code-quality:
+
+  lint-server:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js for Server
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: './server/package-lock.json'
-
+          
       - name: Install Server Dependencies
         working-directory: ./server
         run: npm install
@@ -29,6 +33,19 @@ jobs:
       - name: Lint Server
         working-directory: ./server
         run: npm run lint
+
+  lint-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js for Client
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './client/package-lock.json'
 
       - name: Install Client Dependencies
         working-directory: ./client
@@ -40,7 +57,6 @@ jobs:
 
   # Jest Unit Tests
   jest-test:
-    needs: code-quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +85,7 @@ jobs:
 
   # SonarCloud Analysis
   sonarcloud:
-    needs: jest-test
+    needs: [lint-server, lint-client, jest-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
