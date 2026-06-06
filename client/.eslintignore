@@ -1,0 +1,6 @@
+test/k6/
+node_modules/
+.next/
+out/
+build/
+coverage/

@@ -3,7 +3,9 @@
     "esModuleInterop": true,
     "target": "es5",
     "lib": ["es5", "dom"],
+    "moduleResolution": "node",
+    "typeRoots": ["../node_modules/@types", "../node_modules"],
     "types": ["node", "cypress", "@testing-library/cypress"]
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "support/index.d.ts"]
 }
