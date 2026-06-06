@@ -43,7 +43,7 @@ describe('<LoginForm />', () => {
     await act(async () => {
       userEvent.click(submitButton);
     });
-    await waitFor(() => expect(screen.getByText('Email is required')).toBeInTheDocument());
+    await expect(screen.findByText('Email is required')).resolves.toBeInTheDocument();
 
     expect(screen.getByText('Password is required')).toBeInTheDocument();
   });

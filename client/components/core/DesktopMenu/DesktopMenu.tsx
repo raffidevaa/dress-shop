@@ -1,7 +1,7 @@
-import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import Link from 'next/link';
 import Router from 'next/router';
+import { useTheme } from 'next-themes';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import { IoMdCart } from 'react-icons/io';

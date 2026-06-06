@@ -6,7 +6,5 @@ module.exports = {
       'images.unsplash.com',
       'storage.googleapis.com',
     ],
-    loader: 'akamai',
-    path: '',
   },
 };
