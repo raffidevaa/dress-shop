@@ -128,7 +128,7 @@ jobs:
 
       # Install Client Dependencies
       - name: Install Client Dependencies
-        run: npm install --prefix client
+        run: npm install --prefix client --legacy-peer-deps
 
       # Run Cypress E2E Test
       - name: Run Cypress E2E Tests
