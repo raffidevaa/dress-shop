@@ -7,7 +7,7 @@ class APIFeatures<T extends Document> {
   queryString: QueryString;
   total: number | PromiseLike<number>;
   model: Model<T>;
-  filterQuery: any; // Changed to any
+  filterQuery: Record<string, unknown>; // Properly typed
 
 
   constructor(query: Query<T[], T>, model: Model<T>, queryString: QueryString) {
@@ -29,12 +29,11 @@ class APIFeatures<T extends Document> {
     }
 
     // 1B) Advanced filtering
-    let queryStr = JSON.stringify(queryObj);
+    const queryStr = JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-    this.filterQuery = {};
+    this.filterQuery = JSON.parse(queryStr);
     this.query = this.query.find(this.filterQuery);
+
 
 
     return this;
