@@ -1,27 +1,75 @@
 name: CI — Code Quality, Tests, and SonarCloud Analysis
+
 on:
   push:
-    branches:
-      - main
+    paths:
+    - 'client/**'
+    - 'server/**'
+    - '.github/workflows/**'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast1
   ARTIFACT_REPO: dress-shop-repo
+
 jobs:
+
+  detect-changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      client_changed: ${{ steps.client.outputs.any_changed }}
+      server_changed: ${{ steps.server.outputs.any_changed }}
+      workflow_changed: ${{ steps.workflow.outputs.any_changed }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: client
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            client/**
+          skip_ci: true
+
+      - id: server
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            server/**
+          skip_ci: true
+
+      - id: workflow
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            .github/workflows/**
+          skip_ci: true
+
   # Install Dependencies and Code Quality Check (Linting)
-  code-quality:
+  lint-server:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.server_changed == 'true' || 
+      needs.detect-changes.outputs.workflow_changed == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js for Server
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: './server/package-lock.json'
-
+          
       - name: Install Server Dependencies
         working-directory: ./server
         run: npm install
@@ -29,6 +77,22 @@ jobs:
       - name: Lint Server
         working-directory: ./server
         run: npm run lint
+
+  lint-client:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.client_changed == 'true' || 
+      needs.detect-changes.outputs.workflow_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js for Client
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './client/package-lock.json'
 
       - name: Install Client Dependencies
         working-directory: ./client
@@ -40,8 +104,12 @@ jobs:
 
   # Jest Unit Tests
   jest-test:
-    needs: code-quality
+    needs: detect-changes
     runs-on: ubuntu-latest
+    if: |
+      needs.detect-changes.outputs.client_changed == 'true' ||
+      needs.detect-changes.outputs.server_changed == 'true' ||
+      needs.detect-changes.outputs.workflow_changed == 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -69,7 +137,11 @@ jobs:
 
   # SonarCloud Analysis
   sonarcloud:
-    needs: jest-test
+    needs: [lint-server, lint-client, jest-test]
+    if: |
+      always() &&
+      (needs.lint-server.result == 'success' || needs.lint-server.result == 'skipped') &&
+      (needs.lint-client.result == 'success' || needs.lint-client.result == 'skipped') 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
