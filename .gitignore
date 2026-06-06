@@ -18,3 +18,9 @@ yarn-error.log*
 
 /terraform/.terraform
 /terraform/.terraform.lock.hcl
+
+client-audit-report.txt
+server-audit-report.txt
+
+docker-build-client-log.txt
+docker-build-server-log.txt

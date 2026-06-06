@@ -72,7 +72,7 @@ export const remove = async (req: Request, res: Response) => {
 
   if (!product) return res.status(404).json({ message: 'Product not found' });
 
-  product.remove();
+  product.deleteOne();
 
   res.status(204).json({ data: null });
 };

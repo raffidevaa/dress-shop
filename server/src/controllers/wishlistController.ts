@@ -30,16 +30,15 @@ export const store = async (req: Request, res: Response) => {
     }
 
     wishlist = await Wishlist.create({ product: productId, user: user._id });
-    wishlist = await wishlist.populate('product').execPopulate();
-
+    wishlist = await wishlist.populate('product');
     res.status(200).json({ data: wishlist });
-  } catch {
+    } catch {
     res.status(500).json({ message: 'Error in adding wishlist' });
-  }
-};
+    }
+    };
 
-export const destroy = async (req: Request, res: Response) => {
-  try {
+    export const destroy = async (req: Request, res: Response) => {
+    try {
     const user = req.user as UserTypes;
     const { productId } = req.body;
     const wishlist = await Wishlist.findOne({
@@ -53,10 +52,11 @@ export const destroy = async (req: Request, res: Response) => {
         .json({ message: 'Product is not in your  wishlist' });
     }
 
-    await wishlist.remove();
+    await wishlist.deleteOne();
 
     res.status(200).json({ data: null });
-  } catch {
+    } catch {
     res.status(500).json({ message: 'Error in adding wishlist' });
-  }
-};
+    }
+    };
+
