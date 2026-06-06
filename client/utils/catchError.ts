@@ -15,18 +15,16 @@ interface ErrorData {
   message: string;
 }
 
-export const catchError = (error: ErrorData): string | undefined => {
-  let errorMsg: string | undefined = '';
+export const catchError = (error: any): string => {
   if (error.response) {
-    errorMsg = error.response?.data?.message;
-
-    if (error.response?.data?.error) {
-      errorMsg = error.response.data.error.message;
-    }
-  } else {
-    //something else happened
-    errorMsg = error.message;
+    const errorMsg = error.response?.data?.message || error.response?.data?.error?.message;
+    if (errorMsg) return errorMsg;
+    return `Server Error: ${error.response.status}`;
   }
 
-  return errorMsg;
+  if (error.request) {
+    return 'No response from server. Check your network or API URL.';
+  }
+
+  return error.message || 'An unknown error occurred';
 };
