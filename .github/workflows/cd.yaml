@@ -32,6 +32,9 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Debug Project ID
+        run: echo "Current Project ID is ${{ env.PROJECT_ID }}"
+
       - name: Verify server image exists in GCR
         run: |
           for i in {1..3}; do
