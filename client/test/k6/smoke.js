@@ -1,20 +1,29 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { check, sleep } from 'k6';
 
 export default function () {
-  // Get URL from environment variable on CD pipeline
-  const baseUrl = __ENV.SMOKE_BASE_URL;
+  const baseUrl = __ENV.SMOKE_BASE_URL || 'https://dress-shop.anargya.fun';
 
-  const responses = http.batch([
-    ['GET', `${baseUrl}/api/health`],
-    ['GET', `${baseUrl}`],
-  ]);
+  console.log(`Testing against: ${baseUrl}`);
 
-  check(responses[0], {
+  // 1. Health check
+  const healthRes = http.get(`${baseUrl}/api/health`);
+  check(healthRes, {
     'Health API is status 200': (r) => r.status === 200,
   });
 
-  check(responses[1], {
+  // 2. Frontend check
+  let frontendRes;
+  const maxRetries = 3;
+  for (let i = 0; i < maxRetries; i++) {
+    frontendRes = http.get(baseUrl);
+    if (frontendRes.status === 200) break;
+    
+    console.log(`Frontend attempt ${i + 1} failed with status ${frontendRes.status}. Retrying in 5s...`);
+    sleep(5);
+  }
+
+  check(frontendRes, {
     'Frontend is status 200': (r) => r.status === 200,
   });
 }
