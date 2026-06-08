@@ -170,7 +170,8 @@ jobs:
   # Build and Push Docker Image to GCR
   build-and-push:
     needs: sonarcloud
-    if: success()
+    if: |
+      needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped'
     runs-on: ubuntu-latest
     permissions:
       contents: read
