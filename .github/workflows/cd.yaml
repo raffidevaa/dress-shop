@@ -20,6 +20,10 @@ jobs:
       contents: read
       id-token: write
 
+    outputs:
+      server_url: ${{ steps.get_urls.outputs.server_url }}
+      client_url: ${{ steps.get_urls.outputs.client_url }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -82,16 +86,6 @@ jobs:
             --set-env-vars NODE_ENV=production \
             --quiet
 
-      - name: Print service URL
-        run: |
-          gcloud run services describe ${{ env.SERVICE_NAME }}-server \
-            --region ${{ env.REGION }} \
-            --format "value(status.url)"
-
-          gcloud run services describe ${{ env.SERVICE_NAME }}-client \
-            --region ${{ env.REGION }} \
-            --format "value(status.url)"
-
       - name: Deploy Discord Bridge Cloud Function
         run: |
           gcloud functions deploy discord-bridge \
@@ -103,31 +97,57 @@ jobs:
             --trigger-http \
             --allow-unauthenticated \
             --set-secrets="DISCORD_WEBHOOK_ALERTS=DISCORD_WEBHOOK_ALERTS:latest,DISCORD_WEBHOOK_ERRORS=DISCORD_WEBHOOK_ERRORS:latest,DISCORD_WEBHOOK_UPTIME=DISCORD_WEBHOOK_UPTIME:latest"
-  
-  # Post-Deployment Tests
-  post-deploy-test:
-    name: Post-Deployment Tests
+
+      - name: Capture deployed service URLs
+        id: get_urls
+        run: |
+          SERVER_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }}-server \
+            --region ${{ env.REGION }} \
+            --format "value(status.url)")
+
+          CLIENT_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }}-client \
+            --region ${{ env.REGION }} \
+            --format "value(status.url)")
+
+          echo "server_url=$SERVER_URL" >> $GITHUB_OUTPUT
+          echo "client_url=$CLIENT_URL" >> $GITHUB_OUTPUT
+
+          echo "Server: $SERVER_URL"
+          echo "Client: $CLIENT_URL"
+
+  smoke-test:
+    name: Smoke Tests
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
-  
+
       - name: Setup k6
         uses: grafana/setup-k6-action@v1
 
       - name: Run k6 Smoke Tests
         run: k6 run ./client/test/k6/smoke.js
         env:
-          BASE_URL: http://localhost:8080
+          SMOKE_BASE_URL: ${{ needs.deploy.outputs.server_url }}
+
+  e2e-test:
+    name: E2E Tests
+    needs: [deploy, smoke-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Install Client Dependencies
+      - name: Install client dependencies
         run: npm install --prefix client --legacy-peer-deps
 
       - name: Run Cypress E2E Tests
         run: npx cypress run --project client
+        env:
+          CYPRESS_BASE_URL: ${{ needs.deploy.outputs.client_url }}
