@@ -28,7 +28,9 @@ describe('ProductService', () => {
 
       const result = await ProductService.getProducts({ page: 1, limit: 10 });
       expect(result).toEqual(products);
-      expect(mockApiClient.get).toHaveBeenCalledWith('/api/products', { params: { page: 1, limit: 10 } });
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/products', {
+        params: { page: 1, limit: 10 },
+      });
     });
 
     test('getProducts throws error on failure', async () => {
@@ -49,7 +51,9 @@ describe('ProductService', () => {
     });
 
     test('getProduct throws error on failure', async () => {
-      mockApiClient.get.mockRejectedValueOnce({ response: { status: 404, data: { message: 'Product not found' } } });
+      mockApiClient.get.mockRejectedValueOnce({
+        response: { status: 404, data: { message: 'Product not found' } },
+      });
       await expect(getProduct('p_1')).rejects.toThrow('Product not found');
     });
   });

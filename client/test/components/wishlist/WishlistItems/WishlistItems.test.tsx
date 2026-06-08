@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen } from '@/test/test-utils';
+
 import WishlistItems from '@/components/wishlist/WishlistItems';
 import { productGenerator } from '@/test/data-generators';
+import { render, screen } from '@/test/test-utils';
 
 const mockUseWishlist = jest.fn();
 jest.mock('@/hooks/wishlist/useWishlist', () => () => mockUseWishlist());
@@ -38,9 +39,9 @@ describe('<WishlistItems />', () => {
       { _id: '2', product: productGenerator({ name: 'Product 2' }) },
     ];
     mockUseWishlist.mockReturnValue({ data: mockData, isLoading: false });
-    
+
     render(<WishlistItems />);
-    
+
     expect(screen.getByText('Product 1')).toBeInTheDocument();
     expect(screen.getByText('Product 2')).toBeInTheDocument();
   });

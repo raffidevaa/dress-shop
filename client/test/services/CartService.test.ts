@@ -47,7 +47,10 @@ describe('CartService', () => {
 
       const result = await CartService.addCartItem('prod_1', 2);
       expect(result).toEqual(cartItem);
-      expect(mockApiClient.post).toHaveBeenCalledWith('api/cart', { quantity: 2, productId: 'prod_1' });
+      expect(mockApiClient.post).toHaveBeenCalledWith('api/cart', {
+        quantity: 2,
+        productId: 'prod_1',
+      });
     });
 
     test('addCartItem throws error on failure', async () => {
@@ -60,7 +63,9 @@ describe('CartService', () => {
     test('removeCartItem succeeds on success', async () => {
       mockApiClient.delete.mockResolvedValueOnce({ data: { success: true } });
       await expect(CartService.removeCartItem('prod_1')).resolves.toBeDefined();
-      expect(mockApiClient.delete).toHaveBeenCalledWith('api/cart', { data: { productId: 'prod_1' } });
+      expect(mockApiClient.delete).toHaveBeenCalledWith('api/cart', {
+        data: { productId: 'prod_1' },
+      });
     });
 
     test('removeCartItem throws error on failure', async () => {
@@ -73,7 +78,10 @@ describe('CartService', () => {
     test('updateQuantityCarItem succeeds on success', async () => {
       mockApiClient.put.mockResolvedValueOnce({ data: { success: true } });
       await expect(CartService.updateQuantityCarItem('prod_1', 5)).resolves.toBeDefined();
-      expect(mockApiClient.put).toHaveBeenCalledWith('api/cart', { productId: 'prod_1', quantity: 5 });
+      expect(mockApiClient.put).toHaveBeenCalledWith('api/cart', {
+        productId: 'prod_1',
+        quantity: 5,
+      });
     });
 
     test('updateQuantityCarItem throws error on failure', async () => {

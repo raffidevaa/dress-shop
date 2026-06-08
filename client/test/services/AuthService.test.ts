@@ -46,7 +46,9 @@ describe('AuthService', () => {
 
       const result = await AuthService.verifyGoogleIdToken('google-id-token');
       expect(result).toEqual({ user, token: 'token-2' });
-      expect(mockApiClient.post).toHaveBeenCalledWith('api/auth/google', { idToken: 'google-id-token' });
+      expect(mockApiClient.post).toHaveBeenCalledWith('api/auth/google', {
+        idToken: 'google-id-token',
+      });
     });
 
     test('verifyGoogleIdToken throws error on failure', async () => {
@@ -69,7 +71,9 @@ describe('AuthService', () => {
     });
 
     test('login throws error on failure', async () => {
-      mockApiClient.post.mockRejectedValueOnce({ response: { data: { message: 'Invalid credentials' } } });
+      mockApiClient.post.mockRejectedValueOnce({
+        response: { data: { message: 'Invalid credentials' } },
+      });
       await expect(AuthService.login('a@b.com', 'p')).rejects.toThrow('Invalid credentials');
     });
   });
@@ -81,12 +85,18 @@ describe('AuthService', () => {
 
       const result = await AuthService.signUp({ email: 'n@e.com', password: 'p', name: 'N' });
       expect(result).toEqual({ user, token: 'token-4' });
-      expect(mockApiClient.post).toHaveBeenCalledWith('api/auth/signup', { email: 'n@e.com', password: 'p', name: 'N' });
+      expect(mockApiClient.post).toHaveBeenCalledWith('api/auth/signup', {
+        email: 'n@e.com',
+        password: 'p',
+        name: 'N',
+      });
     });
 
     test('signUp throws error on failure', async () => {
       mockApiClient.post.mockRejectedValueOnce({ response: { status: 409 } });
-      await expect(AuthService.signUp({ email: 'n@e.com', password: 'p', name: 'N' })).rejects.toThrow('Server Error: 409');
+      await expect(
+        AuthService.signUp({ email: 'n@e.com', password: 'p', name: 'N' })
+      ).rejects.toThrow('Server Error: 409');
     });
   });
 
@@ -95,7 +105,11 @@ describe('AuthService', () => {
       const user = userGenerator();
       mockApiClient.patch.mockResolvedValueOnce({ data: { data: { user, token: 'token-5' } } });
 
-      const result = await changePassword({ oldPassword: 'o', newPassword: 'n', confirmNewPassword: 'n' });
+      const result = await changePassword({
+        oldPassword: 'o',
+        newPassword: 'n',
+        confirmNewPassword: 'n',
+      });
       expect(result).toEqual({ user, token: 'token-5' });
       expect(mockApiClient.patch).toHaveBeenCalledWith('api/auth/change-password', {
         oldPassword: 'o',
@@ -106,7 +120,9 @@ describe('AuthService', () => {
 
     test('changePassword throws error on failure', async () => {
       mockApiClient.patch.mockRejectedValueOnce({ response: { status: 400 } });
-      await expect(changePassword({ oldPassword: 'o', newPassword: 'n', confirmNewPassword: 'n' })).rejects.toThrow('Server Error: 400');
+      await expect(
+        changePassword({ oldPassword: 'o', newPassword: 'n', confirmNewPassword: 'n' })
+      ).rejects.toThrow('Server Error: 400');
     });
   });
 
@@ -117,7 +133,11 @@ describe('AuthService', () => {
 
       const result = await updateProfile('uid', { name: 'U', email: 'u@e.com', image: null });
       expect(result).toEqual(user);
-      expect(mockApiClient.patch).toHaveBeenCalledWith('api/users/uid', { name: 'U', email: 'u@e.com', image: null });
+      expect(mockApiClient.patch).toHaveBeenCalledWith('api/users/uid', {
+        name: 'U',
+        email: 'u@e.com',
+        image: null,
+      });
     });
 
     test('updateProfile throws error on failure', async () => {

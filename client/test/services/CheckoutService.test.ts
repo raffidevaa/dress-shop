@@ -33,7 +33,9 @@ describe('CheckOutService', () => {
     });
 
     test('stripeCharge throws error on failure', async () => {
-      mockApiClient.post.mockRejectedValueOnce({ response: { status: 500, data: { message: 'Stripe Error' } } });
+      mockApiClient.post.mockRejectedValueOnce({
+        response: { status: 500, data: { message: 'Stripe Error' } },
+      });
 
       await expect(CheckOutService.stripeCharge('pm_123')).rejects.toThrow('Stripe Error');
     });
@@ -50,7 +52,9 @@ describe('CheckOutService', () => {
     });
 
     test('createPaypalTransaction throws error on failure', async () => {
-      mockApiClient.post.mockRejectedValueOnce({ response: { status: 400, data: { message: 'Paypal Error' } } });
+      mockApiClient.post.mockRejectedValueOnce({
+        response: { status: 400, data: { message: 'Paypal Error' } },
+      });
 
       await expect(CheckOutService.createPaypalTransaction()).rejects.toThrow('Paypal Error');
     });
@@ -69,7 +73,9 @@ describe('CheckOutService', () => {
     test('capturePaypalTransaction throws error on failure', async () => {
       mockApiClient.post.mockRejectedValueOnce({ response: { status: 500 } });
 
-      await expect(CheckOutService.capturePaypalTransaction('PAYPAL_123')).rejects.toThrow('Server Error: 500');
+      await expect(CheckOutService.capturePaypalTransaction('PAYPAL_123')).rejects.toThrow(
+        'Server Error: 500'
+      );
     });
   });
 });

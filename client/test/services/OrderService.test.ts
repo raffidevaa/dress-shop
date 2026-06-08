@@ -39,7 +39,9 @@ describe('OrderService', () => {
     });
 
     test('getOrders throws error on failure', async () => {
-      mockApiClient.get.mockRejectedValueOnce({ response: { status: 401, data: { message: 'Unauthorized' } } });
+      mockApiClient.get.mockRejectedValueOnce({
+        response: { status: 401, data: { message: 'Unauthorized' } },
+      });
 
       await expect(OrderService.getOrders()).rejects.toThrow('Unauthorized');
     });

@@ -1,10 +1,9 @@
 import Router from 'next/router';
 import React from 'react';
 
+import LoginForm from '@/components/auth/LoginForm/LoginForm';
 import { userGenerator } from '@/test/data-generators';
 import { act, render, screen, userEvent, waitFor } from '@/test/test-utils';
-
-import LoginForm from '@/components/auth/LoginForm/LoginForm';
 
 jest.mock('next/router', () => ({
   push: jest.fn(),

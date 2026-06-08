@@ -1,10 +1,9 @@
 import Router from 'next/router';
 import React from 'react';
 
+import SignUpForm from '@/components/auth/SignUpForm';
 import { userGenerator } from '@/test/data-generators';
 import { render, screen, userEvent, waitFor } from '@/test/test-utils';
-
-import SignUpForm from '@/components/auth/SignUpForm';
 
 jest.mock('next/router', () => ({
   push: jest.fn(),
@@ -37,7 +36,7 @@ describe('<SignupForm />', () => {
 
     userEvent.click(submitButton);
 
-    await waitFor(() => expect(screen.getByText('Email is required')).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByText('Password is required')).toBeInTheDocument());
+    await screen.findByText('Email is required');
+    await screen.findByText('Password is required');
   });
 });

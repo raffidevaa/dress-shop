@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+
 import WishlistItem from '@/components/wishlist/WishlistItems/WishlistItem';
 import { productGenerator } from '@/test/data-generators';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 
 const mockRemoveToWishlist = jest.fn();
 jest.mock('@/hooks/wishlist/useRemoveItem', () => () => ({

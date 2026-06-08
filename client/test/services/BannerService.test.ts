@@ -32,7 +32,9 @@ describe('BannerService', () => {
     });
 
     test('getBanners throws error on failure', async () => {
-      mockApiClient.get.mockRejectedValueOnce({ response: { data: { message: 'Could not load banners' } } });
+      mockApiClient.get.mockRejectedValueOnce({
+        response: { data: { message: 'Could not load banners' } },
+      });
       await expect(BannerService.getBanners()).rejects.toThrow('Could not load banners');
     });
   });

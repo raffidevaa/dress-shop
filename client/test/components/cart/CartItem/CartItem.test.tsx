@@ -1,9 +1,9 @@
-import { cartItemGenerator } from '@/test/data-generators';
-import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
-import formatPrice from '@/utils/formatPrice';
 import React from 'react';
 
 import CartItem from '@/components/cart/CartItem';
+import { cartItemGenerator } from '@/test/data-generators';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+import formatPrice from '@/utils/formatPrice';
 
 const mockRemoveFromCart = jest.fn();
 const mockUpdateFromCart = jest.fn();

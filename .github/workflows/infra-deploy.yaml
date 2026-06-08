@@ -22,6 +22,11 @@ jobs:
       TF_VAR_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
       TF_VAR_REGION: ${{ secrets.REGION }}
       TF_VAR_DOMAIN: ${{ secrets.DOMAIN }}
+      TF_VAR_STRIPE_SECRET_API_KEY: ${{ secrets.STRIPE_SECRET_API_KEY }}
+      TF_VAR_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      TF_VAR_DISCORD_WEBHOOK_ALERTS: ${{ secrets.DISCORD_WEBHOOK_ALERTS }}
+      TF_VAR_DISCORD_WEBHOOK_ERRORS: ${{ secrets.DISCORD_WEBHOOK_ERRORS }}
+      TF_VAR_DISCORD_WEBHOOK_UPTIME: ${{ secrets.DISCORD_WEBHOOK_UPTIME }}
       GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
     steps:
@@ -43,7 +48,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./terraform
-        run: terraform plan -out=tfplan
+        run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'

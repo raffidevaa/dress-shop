@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@/test/test-utils';
+
 import SearchFilter from '@/components/search/SearchFilter';
+import { render, screen, fireEvent } from '@/test/test-utils';
 
 describe('<SearchFilter />', () => {
   test('renders and handles selection', () => {
@@ -20,11 +21,11 @@ describe('<SearchFilter />', () => {
 
   test('opens and closes dropdown', () => {
     render(<SearchFilter handleChange={jest.fn()} active="" />);
-    
+
     const toggleButton = screen.getByRole('button', { name: /Price/i });
     fireEvent.click(toggleButton);
     expect(screen.getByText(/Low to High/i)).toBeInTheDocument();
-    
+
     fireEvent.click(toggleButton);
     expect(screen.queryByText(/Low to High/i)).not.toBeInTheDocument();
   });

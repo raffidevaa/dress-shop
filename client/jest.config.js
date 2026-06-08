@@ -10,7 +10,7 @@ module.exports = {
   ],
   coveragePathIgnorePatterns: [
     '/node_modules/',
-    '/\.next/',
+    '/.next/',
     '/cypress/',
     '/coverage/',
     '/types/',

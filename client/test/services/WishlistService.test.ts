@@ -54,9 +54,13 @@ describe('WishlistService', () => {
     });
 
     test('addWishlistItem throws error on failure', async () => {
-      mockApiClient.post.mockRejectedValueOnce({ response: { status: 400, data: { message: 'Already in wishlist' } } });
+      mockApiClient.post.mockRejectedValueOnce({
+        response: { status: 400, data: { message: 'Already in wishlist' } },
+      });
 
-      await expect(WishlistService.addWishlistItem('prod_123')).rejects.toThrow('Already in wishlist');
+      await expect(WishlistService.addWishlistItem('prod_123')).rejects.toThrow(
+        'Already in wishlist'
+      );
     });
   });
 
@@ -65,11 +69,15 @@ describe('WishlistService', () => {
       mockApiClient.delete.mockResolvedValueOnce({ data: { success: true } });
 
       await expect(WishlistService.removeWishlistItem('prod_123')).resolves.toBeDefined();
-      expect(mockApiClient.delete).toHaveBeenCalledWith('api/wishlist', { data: { productId: 'prod_123' } });
+      expect(mockApiClient.delete).toHaveBeenCalledWith('api/wishlist', {
+        data: { productId: 'prod_123' },
+      });
     });
 
     test('removeWishlistItem throws error on failure', async () => {
-      mockApiClient.delete.mockRejectedValueOnce({ response: { status: 404, data: { message: 'Not found' } } });
+      mockApiClient.delete.mockRejectedValueOnce({
+        response: { status: 404, data: { message: 'Not found' } },
+      });
 
       await expect(WishlistService.removeWishlistItem('prod_123')).rejects.toThrow('Not found');
     });

@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@/test/test-utils';
+
 import SearchCategory from '@/components/search/SearchCategory';
+import { render, screen, fireEvent } from '@/test/test-utils';
 
 describe('<SearchCategory />', () => {
   test('renders tabs and handles clicks', () => {
