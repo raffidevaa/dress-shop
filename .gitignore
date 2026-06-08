@@ -24,3 +24,5 @@ server-audit-report.txt
 
 docker-build-client-log.txt
 docker-build-server-log.txt
+
+CLAUDE.md
