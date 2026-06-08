@@ -1,5 +1,6 @@
 name: CI — Code Quality, Tests, and SonarCloud Analysis
 
+# warm-cache benchmark run
 on:
   push:
     paths:
