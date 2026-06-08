@@ -1,4 +1,4 @@
-import { Document, Model, Query, FilterQuery } from 'mongoose';
+import mongoose, { Document, Model, Query } from 'mongoose';
 
 type QueryString = Record<string, unknown>;
 
@@ -7,7 +7,7 @@ class APIFeatures<T extends Document> {
   queryString: QueryString;
   total: number | PromiseLike<number>;
   model: Model<T>;
-  filterQuery: FilterQuery<T>;
+  filterQuery: Record<string, unknown>;
 
 
   constructor(query: Query<T[], T>, model: Model<T>, queryString: QueryString) {
@@ -31,7 +31,7 @@ class APIFeatures<T extends Document> {
     // 1B) Advanced filtering
     const queryStr = JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    this.filterQuery = JSON.parse(queryStr) as FilterQuery<T>;
+    this.filterQuery = JSON.parse(queryStr) as Record<string, unknown>;
     this.query = this.query.find(this.filterQuery);
 
 
