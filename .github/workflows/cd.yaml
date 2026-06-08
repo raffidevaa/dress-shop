@@ -145,12 +145,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './client/package-lock.json'
 
       - name: Install client dependencies
-        run: npm install --prefix client --legacy-peer-deps
+        working-directory: ./client
+        run: npm install --legacy-peer-deps
 
       - name: Run Cypress E2E Tests
-        run: npx cypress run --project client
+        working-directory: ./client
+        run: npx cypress run
         env:
-          CLIENT_BASE_URL: ${{ needs.deploy.outputs.client_url }}
+          CYPRESS_BASE_URL: ${{ needs.deploy.outputs.client_url }}

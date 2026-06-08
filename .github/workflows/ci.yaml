@@ -87,7 +87,7 @@ jobs:
       - name: Setup Node.js for Client
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './client/package-lock.json'
 
@@ -113,7 +113,7 @@ jobs:
       - name: Setup Node.js for Client Test
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './client/package-lock.json'
 
