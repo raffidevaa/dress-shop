@@ -1,4 +1,9 @@
-module.exports = {
+const nextJest = require('next/jest');
+
+const createJestConfig = nextJest({ dir: './' });
+
+/** @type {import('jest').Config} */
+const customConfig = {
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',
     'hooks/**/*.{ts,tsx}',
@@ -38,8 +43,6 @@ module.exports = {
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/test/**/*.test.{ts,tsx,js,jsx}'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
-  },
-  transformIgnorePatterns: ['/node_modules/', '^.+\\.module\\.(css|sass|scss)$'],
 };
+
+module.exports = createJestConfig(customConfig);
