@@ -35,6 +35,54 @@ resource "google_secret_manager_secret" "discord_webhooks" {
   }
 }
 
+resource "google_secret_manager_secret_version" "discord_webhooks" {
+  for_each = {
+    alerts = var.DISCORD_WEBHOOK_ALERTS
+    errors = var.DISCORD_WEBHOOK_ERRORS
+    uptime = var.DISCORD_WEBHOOK_UPTIME
+  }
+  secret      = google_secret_manager_secret.discord_webhooks[each.key].id
+  secret_data = each.value
+}
+
+# Secret Manager for Stripe Secret API Key (server runtime)
+resource "google_secret_manager_secret" "stripe_secret_api_key" {
+  secret_id = "STRIPE_SECRET_API_KEY"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "stripe_secret_api_key_access" {
+  secret_id = google_secret_manager_secret.stripe_secret_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+}
+
+resource "google_secret_manager_secret_version" "stripe_secret_api_key" {
+  secret      = google_secret_manager_secret.stripe_secret_api_key.id
+  secret_data = var.STRIPE_SECRET_API_KEY
+}
+
+# Secret Manager for Stripe Publishable Key (client build-time)
+resource "google_secret_manager_secret" "stripe_publishable_key" {
+  secret_id = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "stripe_publishable_key_access" {
+  secret_id = google_secret_manager_secret.stripe_publishable_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+}
+
+resource "google_secret_manager_secret_version" "stripe_publishable_key" {
+  secret      = google_secret_manager_secret.stripe_publishable_key.id
+  secret_data = var.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+}
+
 # Secret Manager for Google OAuth
 resource "google_secret_manager_secret" "google_secrets" {
   for_each  = toset(["web_client_id", "client_secret"])

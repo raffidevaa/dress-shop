@@ -19,3 +19,32 @@ variable "DOMAIN" {
   type        = string
 }
 
+variable "STRIPE_SECRET_API_KEY" {
+  description = "Stripe secret API key (server runtime)"
+  type        = string
+  sensitive   = true
+}
+
+variable "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" {
+  description = "Stripe publishable key (client build-time)"
+  type        = string
+}
+
+variable "DISCORD_WEBHOOK_ALERTS" {
+  description = "Discord webhook URL for alerts (discord-bridge function)"
+  type        = string
+  sensitive   = true
+}
+
+variable "DISCORD_WEBHOOK_ERRORS" {
+  description = "Discord webhook URL for errors (discord-bridge function)"
+  type        = string
+  sensitive   = true
+}
+
+variable "DISCORD_WEBHOOK_UPTIME" {
+  description = "Discord webhook URL for uptime (discord-bridge function)"
+  type        = string
+  sensitive   = true
+}
+
