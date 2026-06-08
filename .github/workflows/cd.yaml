@@ -129,7 +129,8 @@ jobs:
       - name: Run k6 Smoke Tests
         run: k6 run ./client/test/k6/smoke.js
         env:
-          SMOKE_BASE_URL: ${{ needs.deploy.outputs.server_url }}
+          SERVER_BASE_URL: ${{ needs.deploy.outputs.server_url }}
+          CLIENT_BASE_URL: ${{ needs.deploy.outputs.client_url }}
 
   e2e-test:
     name: E2E Tests
@@ -150,4 +151,4 @@ jobs:
       - name: Run Cypress E2E Tests
         run: npx cypress run --project client
         env:
-          CYPRESS_BASE_URL: ${{ needs.deploy.outputs.client_url }}
+          CLIENT_BASE_URL: ${{ needs.deploy.outputs.client_url }}
