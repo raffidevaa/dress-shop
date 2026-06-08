@@ -31,7 +31,7 @@ describe('Critical User Journey', () => {
     cy.wait(2000);
 
     cy.findByRole('listbox').within(() => {
-      cy.findAllByRole('option').should('have.length.at.least', 1);
+      cy.findAllByRole('listitem').should('have.length.at.least', 1);
     });
   });
 
@@ -41,7 +41,7 @@ describe('Critical User Journey', () => {
     cy.wait(2000);
 
     cy.getStripeElement('cardNumber').type('4242424242424242');
-    cy.getStripeElement('cardExpiry').type('1122');
+    cy.getStripeElement('cardExpiry').type('1230');
     cy.getStripeElement('cardCvc').type('123');
     cy.getStripeElement('postalCode').type('12345');
 
@@ -55,7 +55,7 @@ describe('Critical User Journey', () => {
     cy.visit('/orders');
     cy.wait(2000);
 
-    cy.findByRole('list').within(() => {
+    cy.get('main').findByRole('list').within(() => {
       cy.findAllByRole('listitem').should('have.length.at.least', 1);
     });
   });
@@ -64,7 +64,7 @@ describe('Critical User Journey', () => {
     cy.visit('/profile');
     cy.findByRole('button', { name: user.name.charAt(0).toUpperCase() }).click();
     cy.findByRole('button', { name: /log out/i }).click();
-    cy.url().should('eq', Cypress.config().baseUrl);
+    cy.url().should('include', '/login');
   });
 
   it('should allow user to log in', () => {

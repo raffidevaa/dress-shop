@@ -16,7 +16,7 @@ export const useLogin = () => {
   return useCallback(async (email: string, password: string) => {
     const { token } = await AuthService.login(email, password);
     autoLogin(token);
-    mutate('/api/me');
+    await mutate('/api/me');
   }, []);
 };
 

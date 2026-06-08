@@ -4,6 +4,8 @@ export default defineConfig({
   viewportWidth: 1024,
   chromeWebSecurity: false,
   e2e: {
+    testIsolation: false,
+    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setupNodeEvents(on, config) {
       // implement node event listeners here

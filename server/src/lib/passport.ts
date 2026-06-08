@@ -44,7 +44,7 @@ passport.use(
           return done(null, false, { message: 'Email is already taken' });
 
         user = await User.create({
-          email,
+          email: email.toLowerCase(),
           password,
           name,
           role: Role.User,

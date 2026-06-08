@@ -1,14 +1,14 @@
 import React from 'react';
 jest.mock('@stripe/react-stripe-js', () => ({
-    CardElement: (_props: any) => <div data-testid="card-element" />,
+  CardElement: () => <div data-testid="card-element" />,
 }));
 
-import { render, screen } from '@/test/test-utils';
 import CheckoutStripeCard from '@/components/checkout/CheckoutStripeCard';
+import { render, screen } from '@/test/test-utils';
 
 describe('<CheckoutStripeCard />', () => {
-    test('renders CardElement', () => {
-        render(<CheckoutStripeCard onChange={async () => { }} /> as any);
-        expect(screen.getByTestId('card-element')).toBeInTheDocument();
-    });
+  test('renders CardElement', () => {
+    render((<CheckoutStripeCard onChange={async () => {}} />) as any);
+    expect(screen.getByTestId('card-element')).toBeInTheDocument();
+  });
 });
