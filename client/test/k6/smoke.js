@@ -2,8 +2,8 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export default function () {
-  const apiBaseUrl = __ENV.API_BASE_URL;
-  const frontendBaseUrl = __ENV.FRONTEND_BASE_URL;
+  const apiBaseUrl = __ENV.SERVER_BASE_URL;
+  const frontendBaseUrl = __ENV.CLIENT_BASE_URL;
 
   console.log(`Testing API against: ${apiBaseUrl}`);
   console.log(`Testing Frontend against: ${frontendBaseUrl}`);
