@@ -2,9 +2,12 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 export default function () {
+  // Get URL from environment variable on CD pipeline
+  const baseUrl = __ENV.SMOKE_BASE_URL;
+
   const responses = http.batch([
-    ['GET', '<https://dress-shop.anargya.fun/api/health>'],
-    ['GET', '<https://dress-shop.anargya.fun/>'],
+    ['GET', `${baseUrl}/api/health`],
+    ['GET', `${baseUrl}`],
   ]);
 
   check(responses[0], {
