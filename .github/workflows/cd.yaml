@@ -112,6 +112,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+  
       - name: Setup k6
         uses: grafana/setup-k6-action@v1
 
@@ -120,16 +121,13 @@ jobs:
         env:
           BASE_URL: http://localhost:8080
 
-      # Setup Node for Cypress
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # Install Client Dependencies
       - name: Install Client Dependencies
         run: npm install --prefix client --legacy-peer-deps
 
-      # Run Cypress E2E Test
       - name: Run Cypress E2E Tests
         run: npx cypress run --project client

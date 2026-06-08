@@ -1,5 +1,6 @@
 import { cache } from 'swr';
 import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 
 import { server } from './test/server';
 

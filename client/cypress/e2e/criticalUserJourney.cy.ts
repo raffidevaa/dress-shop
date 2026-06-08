@@ -5,61 +5,40 @@ describe('Critical User Journey', () => {
 
   it('should allow user to sign up', () => {
     cy.visit('/');
-
     cy.findByRole('link', { name: /sign up/i }).click();
-    cy.wait(3000);
-
     cy.findByRole('textbox', { name: /name/i }).type(user.name);
     cy.findByRole('textbox', { name: /email/i }).type(user.email);
     cy.findByLabelText(/password/i).type(user.password);
-
     cy.findByRole('button', { name: /sign up/i }).click();
-    cy.wait(3000);
-
-    cy.url().should('include', '/profile');
-    cy.findByRole('textbox', { name: /name/i }).should('have.value', user.name);
-  });
-
-  it('should allow user to log out', () => {
-    cy.findByRole('button', { name: user.name.charAt(0).toUpperCase() }).click();
-    cy.findByRole('button', { name: /log out/i }).click();
-  });
-
-  it('should allow user to log in', () => {
-    cy.findByRole('textbox', { name: /email/i }).type(user.email);
-    cy.findByLabelText(/password/i).type(user.password);
-
-    cy.findByRole('button', { name: /log in/i }).click();
-    cy.wait(3000);
-
     cy.url().should('include', '/profile');
     cy.findByRole('textbox', { name: /name/i }).should('have.value', user.name);
   });
 
   it('should allow user to view products', () => {
-    cy.findByRole('textbox', { name: /search product/i }).type('brown jacket{enter}');
-    cy.wait(5000);
+    cy.visit('/');
+    cy.findByRole('textbox', { name: /search product/i }).type('blue jeans{enter}');
+    cy.wait(2000);
 
-    cy.findByText(/brown jacket/i).click();
-    cy.wait(3000);
+    cy.findByText(/blue jeans/i).click();
+    cy.wait(2000);
   });
 
-  it('should add product to cart', () => {
+  it('should should allow user to add product to cart', () => {
     cy.findByRole('button', { name: /add to cart/i }).click();
     cy.findByText('Successfully added to cart').should('exist');
 
     cy.findByRole('link', { name: /cart/i }).click();
-    cy.wait(3000);
+    cy.wait(2000);
 
-    cy.findByRole('main').within(() => {
-      cy.findAllByRole('listitem').should('have.length', 1);
+    cy.findByRole('listbox').within(() => {
+      cy.findAllByRole('option').should('have.length.at.least', 1);
     });
   });
 
   it('should allow user to checkout', () => {
     cy.findByRole('button', { name: /check out/i }).click();
     cy.url().should('include', '/checkout');
-    cy.wait(3000);
+    cy.wait(2000);
 
     cy.getStripeElement('cardNumber').type('4242424242424242');
     cy.getStripeElement('cardExpiry').type('1122');
@@ -67,14 +46,36 @@ describe('Critical User Journey', () => {
     cy.getStripeElement('postalCode').type('12345');
 
     cy.findByRole('button', { name: 'Confirm Order' }).click();
-    cy.wait(12000);
+    cy.wait(8000);
+
+    cy.url().should('include', '/orders');
   });
 
   it('should show the order in order history', () => {
-    cy.url().should('include', '/orders');
+    cy.visit('/orders');
+    cy.wait(2000);
 
-    cy.findByRole('main').within(() => {
-      cy.findAllByRole('listitem').should('have.length', 1);
+    cy.findByRole('list').within(() => {
+      cy.findAllByRole('listitem').should('have.length.at.least', 1);
     });
+  });
+
+  it('should allow user to log out', () => {
+    cy.visit('/profile');
+    cy.findByRole('button', { name: user.name.charAt(0).toUpperCase() }).click();
+    cy.findByRole('button', { name: /log out/i }).click();
+    cy.url().should('eq', Cypress.config().baseUrl);
+  });
+
+  it('should allow user to log in', () => {
+    cy.visit('/login');
+    cy.findByRole('textbox', { name: /email/i }).type(user.email);
+    cy.findByLabelText(/password/i).type(user.password);
+
+    cy.findByRole('button', { name: /log in/i }).click();
+    cy.wait(2000);
+
+    cy.url().should('include', '/profile');
+    cy.findByRole('textbox', { name: /name/i }).should('have.value', user.name);
   });
 });

@@ -33,6 +33,6 @@
     },
     "incremental": true
   },
-  "exclude": ["node_modules", "jest.setup.ts", "./cypress"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "jest.config.js"]
+  "exclude": ["node_modules", "./cypress", "**/*.test.ts", "**/*.test.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "jest.config.js", "jest.setup.ts",]
 }
