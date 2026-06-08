@@ -2,9 +2,9 @@ import Router from 'next/router';
 import React from 'react';
 
 import { userGenerator } from '@/test/data-generators';
-import { fireEvent, render, screen, userEvent, waitFor } from '@/test/test-utils';
+import { render, screen, userEvent, waitFor } from '@/test/test-utils';
 
-import SignUpForm from './SignUpForm';
+import SignUpForm from '@/components/auth/SignUpForm';
 
 jest.mock('next/router', () => ({
   push: jest.fn(),
@@ -24,11 +24,11 @@ describe('<SignupForm />', () => {
     userEvent.type(passwordInput, fields.password);
 
     const submitButton = screen.getByRole('button', { name: /sign up/i });
-    fireEvent.click(submitButton);
+    userEvent.click(submitButton);
 
     await waitFor(() => expect(submitButton).toBeDisabled());
     await waitFor(() => expect(submitButton).toBeEnabled());
-    expect(Router.push).toHaveBeenCalledWith('/profile');
+    await waitFor(() => expect(Router.push).toHaveBeenCalledWith('/profile'));
   });
 
   test('display input fields error when input fields is empty on form submit', async () => {
@@ -37,7 +37,7 @@ describe('<SignupForm />', () => {
 
     userEvent.click(submitButton);
 
-    await expect(screen.findByText('Email is required')).resolves.toBeInTheDocument();
-    expect(screen.getByText('Password is required')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Email is required')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Password is required')).toBeInTheDocument());
   });
 });

@@ -1,4 +1,4 @@
-import { Document, Model, Query } from 'mongoose';
+import { Document, Model, Query, FilterQuery } from 'mongoose';
 
 type QueryString = Record<string, unknown>;
 
@@ -7,7 +7,7 @@ class APIFeatures<T extends Document> {
   queryString: QueryString;
   total: number | PromiseLike<number>;
   model: Model<T>;
-  filterQuery: Record<string, unknown>; // Properly typed
+  filterQuery: FilterQuery<T>;
 
 
   constructor(query: Query<T[], T>, model: Model<T>, queryString: QueryString) {
@@ -31,7 +31,7 @@ class APIFeatures<T extends Document> {
     // 1B) Advanced filtering
     const queryStr = JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    this.filterQuery = JSON.parse(queryStr);
+    this.filterQuery = JSON.parse(queryStr) as FilterQuery<T>;
     this.query = this.query.find(this.filterQuery);
 
 
@@ -40,7 +40,7 @@ class APIFeatures<T extends Document> {
   }
 
   count() {
-    this.total = this.model.countDocuments(this.filterQuery);
+    this.total = this.model.countDocuments(this.filterQuery).exec();
     return this;
   }
 
@@ -75,6 +75,7 @@ class APIFeatures<T extends Document> {
         ? Number(this.queryString.limit)
         : 20;
     const skip = (page - 1) * limit;
+
     this.query = this.query.skip(skip).limit(limit);
 
     return this;

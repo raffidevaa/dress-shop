@@ -1,7 +1,7 @@
 import { render, screen } from '@/test/test-utils';
 import formatPrice from '@/utils/formatPrice';
 
-import CartSubTotal from './CartSubTotal';
+import CartSubTotal from '@/components/cart/CartSubTotal';
 
 test('renders cart subtotal correctly', () => {
   const fakeTotal = 1000;

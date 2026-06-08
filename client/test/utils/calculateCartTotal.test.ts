@@ -1,6 +1,6 @@
 import { CartItem } from '@/types';
 
-import calculateCartTotal from '../calculateCartTotal';
+import calculateCartTotal from '@/utils/calculateCartTotal';
 
 import { cartItemGenerator } from './../../test/data-generators';
 

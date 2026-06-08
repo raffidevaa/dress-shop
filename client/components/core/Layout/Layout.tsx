@@ -42,6 +42,10 @@ const Layout: React.FC<Props> = ({ children, title = 'Dress Shop' }) => {
     logPageView();
   }, []);
 
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
   return (
     <>
       <Head>

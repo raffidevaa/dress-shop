@@ -1,7 +1,7 @@
 import { categoryGenerator } from '@/test/data-generators';
 import { render, screen } from '@/test/test-utils';
 
-import Categories from './Categories';
+import Categories from '@/components/category/Categories/Categories';
 
 test('renders list of categories', () => {
   const fakeCategories = [categoryGenerator(), categoryGenerator()];

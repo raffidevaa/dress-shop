@@ -6,7 +6,7 @@ import { server } from '@/test/server';
 import { render, screen, waitForElementToBeRemoved, within } from '@/test/test-utils';
 import formatPrice from '@/utils/formatPrice';
 
-import CartList from './CartList';
+import CartList from '@/components/cart/CartList';
 
 beforeEach(() => {
   setCookie({}, 'token', 'fake_user_token', {});

@@ -4,7 +4,7 @@ import React from 'react';
 import { userGenerator } from '@/test/data-generators';
 import { act, render, screen, userEvent, waitFor } from '@/test/test-utils';
 
-import LoginForm from './LoginForm';
+import LoginForm from '@/components/auth/LoginForm/LoginForm';
 
 jest.mock('next/router', () => ({
   push: jest.fn(),

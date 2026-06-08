@@ -1,5 +1,24 @@
 module.exports = {
-  collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', '!**/*.d.ts', '!**/node_modules/**'],
+  collectCoverageFrom: [
+    'components/**/*.{ts,tsx}',
+    'hooks/**/*.{ts,tsx}',
+    'services/**/*.{ts,tsx}',
+    'utils/**/*.{ts,tsx}',
+    'contexts/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
+    '!**/index.ts',
+  ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/\.next/',
+    '/cypress/',
+    '/coverage/',
+    '/types/',
+    '/_app.tsx',
+    '/_document.tsx',
+    'next.config.js',
+    '.prettierrc.js',
+  ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
@@ -17,6 +36,7 @@ module.exports = {
     '^@/test(.*)$': '<rootDir>/test/$1',
   },
   testEnvironment: 'jsdom',
+  testMatch: ['<rootDir>/test/**/*.test.{ts,tsx,js,jsx}'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],

@@ -2,7 +2,7 @@ import { productGenerator } from '@/test/data-generators';
 import { render, screen } from '@/test/test-utils';
 import formatPrice from '@/utils/formatPrice';
 
-import ProductCard from './ProductCard';
+import ProductCard from '@/components/product/ProductCard';
 
 test('renders all the product information correctly', () => {
   const fakeProduct = productGenerator();

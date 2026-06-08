@@ -36,21 +36,18 @@ jobs:
         with:
           files: |
             client/**
-          skip_ci: true
 
       - id: server
         uses: tj-actions/changed-files@v46
         with:
           files: |
             server/**
-          skip_ci: true
 
       - id: workflow
         uses: tj-actions/changed-files@v46
         with:
           files: |
             .github/workflows/**
-          skip_ci: true
 
   # Install Dependencies and Code Quality Check (Linting)
   lint-server:
@@ -132,8 +129,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
-          path: |
-            client/coverage/lcov.info
+          path: client/coverage/lcov.info
 
   # SonarCloud Analysis
   sonarcloud:

@@ -1,4 +1,4 @@
-import formatPrice from '../formatPrice';
+import formatPrice from '@/utils/formatPrice';
 
 test('correctly format price without comma', () => {
   expect(formatPrice(500)).toBe('P500');

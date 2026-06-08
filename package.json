@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/jrussumbrella/dress-shop#readme",
   "devDependencies": {
-    "concurrently": "^5.2.0"
+    "concurrently": "^5.2.0",
+    "cypress": "^14.5.4"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
