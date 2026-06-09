@@ -219,7 +219,7 @@ jobs:
             -Dsonar.sources=client
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=client/coverage/lcov.info
-            -Dsonar.coverage.exclusions=**/pages/**,**/constants/**,**/types/**,**/cypress/**,**/*.config.*,**/jest.setup.*
+            -Dsonar.coverage.exclusions=**/pages/**,**/constants/**,**/types/**,**/cypress/**,**/*.config.*,**/jest.setup.*,**/test/**
             -Dsonar.qualitygate.wait=false
   
   # Build and Push Docker Images to GCR
