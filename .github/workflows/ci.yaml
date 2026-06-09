@@ -202,6 +202,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: coverage-reports
+          path: client/coverage
 
       - name: Scan with SonarCloud
         uses: SonarSource/sonarqube-scan-action@v6
