@@ -214,7 +214,7 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION_KEY }}
-            -Dsonar.sources=client,server/src
+            -Dsonar.sources=client
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=client/coverage/lcov.info
             -Dsonar.qualitygate.wait=false
