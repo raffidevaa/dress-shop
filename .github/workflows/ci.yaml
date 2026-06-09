@@ -169,6 +169,8 @@ jobs:
 
       - name: Run Jest (client)
         working-directory: ./client
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080
         run: npm run test -- --coverage --coverageReporters=lcov --watchAll=false --forceExit --maxWorkers=2 --cacheDirectory=.jest-cache
 
       - name: Upload coverage reports
