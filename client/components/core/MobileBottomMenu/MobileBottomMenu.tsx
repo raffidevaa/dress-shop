@@ -18,7 +18,7 @@ const MobileBottomMenu = () => {
     <>
       <div className={styles.bottomMenu}>
         <div className={`${styles.list} ${pathname === '/' ? styles.active : ''}`}>
-          <Link href="/">
+          <Link href="/" passHref>
             <a className={styles.link}>
               <div className={styles.icon}>
                 <FiHome />
@@ -28,7 +28,7 @@ const MobileBottomMenu = () => {
           </Link>
         </div>
         <div className={`${styles.list} ${pathname === '/search' ? styles.active : ''}`}>
-          <Link href="/search">
+          <Link href="/search" passHref>
             <a className={styles.link}>
               <div className={styles.icon}>
                 <FiSearch />
@@ -38,7 +38,7 @@ const MobileBottomMenu = () => {
           </Link>
         </div>
         <div className={`${styles.list} ${pathname === '/cart' ? styles.active : ''}`}>
-          <Link href="/cart">
+          <Link href="/cart" passHref>
             <a className={styles.link}>
               <div className={styles.icon}>
                 <FiShoppingCart />
@@ -51,7 +51,7 @@ const MobileBottomMenu = () => {
           </Link>
         </div>
         <div className={`${styles.list} ${pathname === '/profile' ? 'active' : ''}`}>
-          <Link href={`${currentUser ? '/profile' : '/login'}`}>
+          <Link href={`${currentUser ? '/profile' : '/login'}`} passHref>
             <a className={styles.link}>
               <div className={styles.icon}>
                 <FiUser />

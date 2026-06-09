@@ -18,7 +18,7 @@ const CheckoutList = ({ items }: Props) => {
         <div key={item._id} className={styles.itemContainer}>
           <div className={styles.info}>
             <div className={styles.main}>
-              <Link href={`/products/${item.product._id}`}>
+              <Link href={`/products/${item.product._id}`} passHref>
                 <a>
                   <Image
                     className={styles.image}

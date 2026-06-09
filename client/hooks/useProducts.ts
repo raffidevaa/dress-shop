@@ -15,9 +15,7 @@ const useProducts = (initialData: Product[]) => {
     { initialData: [initialData] }
   );
 
-  const initialProducts: Product[] = [];
-
-  const products = data ? initialProducts.concat(...data) : [];
+  const products = data ? data.flat() : [];
 
   const isLoadingInitialData = !data && !error;
   const isLoadingMore =

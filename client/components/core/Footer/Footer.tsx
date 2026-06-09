@@ -10,14 +10,14 @@ const Footer = () => {
         <p>© 2020 Dress Shop. All rights reserved.</p>
         <ul className={styles.links}>
           <li>
-            <a href="#">
+            <button type="button" className={styles.socialBtn} aria-label="Facebook">
               <FaFacebook size={22} />
-            </a>
+            </button>
           </li>
           <li>
-            <a href="#">
+            <button type="button" className={styles.socialBtn} aria-label="Instagram">
               <FaInstagram size={22} />
-            </a>
+            </button>
           </li>
           <li>
             <a href="https://github.com/jrussumbrella/dress-shop/" target="_blank" rel="noreferrer">

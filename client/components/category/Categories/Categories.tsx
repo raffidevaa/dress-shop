@@ -15,7 +15,7 @@ const Categories = ({ categories }: Props) => {
     <ul className={styles.categoryContainer}>
       {categories.map((category) => (
         <li className={styles.list} key={category._id}>
-          <Link href={`/search?category=${category.name.toLowerCase()}`}>
+          <Link href={`/search?category=${category.name.toLowerCase()}`} passHref>
             <a>
               <div className={styles.categoryImgWrapper}>
                 <Image alt="" src={category.imageURL} layout="fill" />

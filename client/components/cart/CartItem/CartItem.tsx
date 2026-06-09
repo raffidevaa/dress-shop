@@ -91,7 +91,7 @@ const CartItem = ({ cartItem }: Props) => {
     >
       <div className={styles.product}>
         <div className={styles.productImg}>
-          <Link href={`/products/${cartItem.product._id}`}>
+          <Link href={`/products/${cartItem.product._id}`} passHref>
             <a>
               <Image
                 src={cartItem.product.imageURL}

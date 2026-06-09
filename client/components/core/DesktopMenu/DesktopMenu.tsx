@@ -63,7 +63,7 @@ const DesktopMenu = () => {
           <SearchBar onSubmit={handleSearchSubmit} />
         </div>
         <li>
-          <Link href="/cart">
+          <Link href="/cart" passHref>
             <a>
               <IoMdCart size={30} />
               Cart
@@ -100,7 +100,7 @@ const DesktopMenu = () => {
                   onClick={handleCloseDropDown}
                   onKeyDown={handleCloseDropDown}
                 >
-                  <Link href="/profile">
+                  <Link href="/profile" passHref>
                     <a>My Profile </a>
                   </Link>
                 </div>
@@ -111,7 +111,7 @@ const DesktopMenu = () => {
                   onClick={handleCloseDropDown}
                   onKeyDown={handleCloseDropDown}
                 >
-                  <Link href="/orders">
+                  <Link href="/orders" passHref>
                     <a>My Orders</a>
                   </Link>
                 </div>
@@ -123,7 +123,7 @@ const DesktopMenu = () => {
                   onClick={handleCloseDropDown}
                   onKeyDown={handleCloseDropDown}
                 >
-                  <Link href="/wishlist">
+                  <Link href="/wishlist" passHref>
                     <a>My Wishlist</a>
                   </Link>
                 </div>
@@ -154,11 +154,11 @@ const DesktopMenu = () => {
           </li>
         ) : (
           <li ref={dropdownRef}>
-            <Link href="/signup">
+            <Link href="/signup" passHref>
               <a>Sign Up</a>
             </Link>
             <span className={styles.line}> | </span>
-            <Link href="/login">
+            <Link href="/login" passHref>
               <a>Log In</a>
             </Link>
           </li>
