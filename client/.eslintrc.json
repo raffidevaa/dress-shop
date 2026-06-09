@@ -12,7 +12,7 @@
     "plugin:testing-library/react",
     "plugin:jest-dom/recommended"
   ],
-  "ignorePatterns": ["test/k6/*"],
+  "ignorePatterns": ["test/k6/*", "jest.config.js"],
   "rules": {
     "linebreak-style": "off",
     "react/prop-types": "off",

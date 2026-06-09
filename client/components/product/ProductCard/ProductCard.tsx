@@ -18,7 +18,7 @@ const ProductCard = ({ product }: Props) => {
       <a>
         <div>
           <div className={styles.productImgWrapper}>
-            <Image src={product.imageURL} alt={product.name} width={500} height={500} />
+            <Image src={product.imageURL} alt="" width={500} height={500} />
             <div className={styles.wishlistButtonContainer}>
               <WishlistButton productId={product._id} />
             </div>

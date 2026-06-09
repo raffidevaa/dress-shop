@@ -18,9 +18,9 @@ const Categories = ({ categories }: Props) => {
           <Link href={`/search?category=${category.name.toLowerCase()}`}>
             <a>
               <div className={styles.categoryImgWrapper}>
-                <Image alt={category.name} src={category.imageURL} layout="fill" />
+                <Image alt="" src={category.imageURL} layout="fill" />
               </div>
-              <p className={styles.name}>{category.name}</p>
+              <p className={styles.name}>{category.name.toUpperCase()}</p>
             </a>
           </Link>
         </li>
