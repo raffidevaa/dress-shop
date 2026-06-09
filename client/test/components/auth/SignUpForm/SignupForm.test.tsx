@@ -1,5 +1,6 @@
 import Router from 'next/router';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 
 import SignUpForm from '@/components/auth/SignUpForm';
 import { userGenerator } from '@/test/data-generators';
@@ -18,12 +19,16 @@ describe('<SignupForm />', () => {
     const emailInput = screen.getByPlaceholderText(/email/i);
     const passwordInput = screen.getByPlaceholderText(/password/i);
 
-    userEvent.type(nameInput, fields.name);
-    userEvent.type(emailInput, fields.email);
-    userEvent.type(passwordInput, fields.password);
+    act(() => {
+      userEvent.type(nameInput, fields.name);
+      userEvent.type(emailInput, fields.email);
+      userEvent.type(passwordInput, fields.password);
+    });
 
     const submitButton = screen.getByRole('button', { name: /sign up/i });
-    userEvent.click(submitButton);
+    act(() => {
+      userEvent.click(submitButton);
+    });
 
     await waitFor(() => expect(submitButton).toBeDisabled());
     await waitFor(() => expect(submitButton).toBeEnabled());
@@ -34,7 +39,9 @@ describe('<SignupForm />', () => {
     render(<SignUpForm />);
     const submitButton = screen.getByRole('button', { name: /sign up/i });
 
-    userEvent.click(submitButton);
+    act(() => {
+      userEvent.click(submitButton);
+    });
 
     await screen.findByText('Email is required');
     await screen.findByText('Password is required');

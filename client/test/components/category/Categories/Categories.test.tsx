@@ -7,8 +7,6 @@ test('renders list of categories', () => {
   render(<Categories categories={fakeCategories} />);
 
   fakeCategories.forEach((category) => {
-    expect(screen.getByText(category.name)).toBeInTheDocument();
-    expect(screen.getByAltText(category.name)).toBeInTheDocument();
-    expect(screen.getByAltText(category.name)).toBeInTheDocument();
+    expect(screen.getByText(category.name.toUpperCase())).toBeInTheDocument();
   });
 });

@@ -220,12 +220,13 @@ jobs:
   
   # Build and Push Docker Images to GCR
   build-and-push:
-    needs: [lint-server, lint-client, sonarcloud]
+    needs: [lint-server, lint-client, sonarcloud, jest-test]
     if: |
       always() &&
       (needs.lint-server.result == 'success' || needs.lint-server.result == 'skipped') &&
       (needs.lint-client.result == 'success' || needs.lint-client.result == 'skipped') &&
-      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped')
+      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
+      (needs.jest-test.result == 'success' || needs.jest-test.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: read
