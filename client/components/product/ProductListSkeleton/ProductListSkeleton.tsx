@@ -10,7 +10,7 @@ const ProductListSkeleton = ({ number }: Props) => {
   return (
     <>
       <div className={styles.grid} aria-label="Product list skeleton">
-        {[...new Array(number)].map((_, i) => (
+        {Array.from({ length: number }).map((_, i) => (
           <div key={i} className={styles.gridItem}>
             <div className={styles.gridBoxWrapper}>
               <div className={styles.gridBox}></div>
