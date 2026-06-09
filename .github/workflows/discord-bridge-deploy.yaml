@@ -1,0 +1,41 @@
+name: Deploy Discord Bridge Function
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/functions/discord-bridge/**'
+      - '.github/workflows/discord-bridge-deploy.yaml'
+  workflow_dispatch:
+
+env:
+  REGION: asia-southeast1
+
+jobs:
+  deploy-function:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Deploy Discord Bridge Cloud Function
+        run: |
+          gcloud functions deploy discord-bridge \
+            --gen2 \
+            --runtime=nodejs22 \
+            --region=${{ env.REGION }} \
+            --source=server/functions/discord-bridge \
+            --entry-point=discordBridge \
+            --trigger-http \
+            --allow-unauthenticated \
+            --set-secrets="DISCORD_WEBHOOK_ALERTS=DISCORD_WEBHOOK_ALERTS:latest,DISCORD_WEBHOOK_ERRORS=DISCORD_WEBHOOK_ERRORS:latest,DISCORD_WEBHOOK_UPTIME=DISCORD_WEBHOOK_UPTIME:latest"

@@ -47,22 +47,6 @@ jobs:
             sleep 10
           done
 
-      - name: Deploy server to Cloud Run
-        run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }}-server \
-            --image ${{ env.IMAGE }}/server:${{ github.sha }} \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated \
-            --port 8080 \
-            --memory 1Gi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 10 \
-            --set-env-vars NODE_ENV=production \
-            --set-secrets=DATABASE_URI=DATABASE_URI:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest,STRIPE_SECRET_API_KEY=STRIPE_SECRET_API_KEY:latest \
-            --quiet
-
       - name: Verify client image exists in GCR
         run: |
           for i in {1..3}; do
@@ -71,32 +55,31 @@ jobs:
             sleep 10
           done
 
-      - name: Deploy client to Cloud Run
+      - name: Deploy server & client to Cloud Run (parallel)
         run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }}-server \
+            --image ${{ env.IMAGE }}/server:${{ github.sha }} \
+            --region ${{ env.REGION }} --platform managed --allow-unauthenticated \
+            --port 8080 --memory 1Gi --cpu 1 --min-instances 0 --max-instances 10 \
+            --set-env-vars NODE_ENV=production \
+            --set-secrets=DATABASE_URI=DATABASE_URI:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest,STRIPE_SECRET_API_KEY=STRIPE_SECRET_API_KEY:latest \
+            --quiet &
+          SERVER_PID=$!
+
           gcloud run deploy ${{ env.SERVICE_NAME }}-client \
             --image ${{ env.IMAGE }}/client:${{ github.sha }} \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated \
-            --port 8080 \
-            --memory 512Mi \
-            --cpu 1 \
-            --min-instances 0 \
-            --max-instances 10 \
+            --region ${{ env.REGION }} --platform managed --allow-unauthenticated \
+            --port 8080 --memory 512Mi --cpu 1 --min-instances 0 --max-instances 10 \
             --set-env-vars NODE_ENV=production \
-            --quiet
+            --quiet &
+          CLIENT_PID=$!
 
-      - name: Deploy Discord Bridge Cloud Function
-        run: |
-          gcloud functions deploy discord-bridge \
-            --gen2 \
-            --runtime=nodejs22 \
-            --region=${{ env.REGION }} \
-            --source=server/functions/discord-bridge \
-            --entry-point=discordBridge \
-            --trigger-http \
-            --allow-unauthenticated \
-            --set-secrets="DISCORD_WEBHOOK_ALERTS=DISCORD_WEBHOOK_ALERTS:latest,DISCORD_WEBHOOK_ERRORS=DISCORD_WEBHOOK_ERRORS:latest,DISCORD_WEBHOOK_UPTIME=DISCORD_WEBHOOK_UPTIME:latest"
+          SERVER_RC=0; CLIENT_RC=0
+          wait $SERVER_PID || SERVER_RC=$?
+          wait $CLIENT_PID || CLIENT_RC=$?
+          if [ $SERVER_RC -ne 0 ] || [ $CLIENT_RC -ne 0 ]; then
+            echo "Deploy failed (server=$SERVER_RC client=$CLIENT_RC)"; exit 1
+          fi
 
       - name: Capture deployed service URLs
         id: get_urls
@@ -149,9 +132,27 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './client/package-lock.json'
 
+      - name: Cache client node_modules
+        uses: actions/cache@v4
+        id: cache-client-modules
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-client-modules-${{ hashFiles('client/package-lock.json') }}
+
       - name: Install client dependencies
+        if: steps.cache-client-modules.outputs.cache-hit != 'true'
         working-directory: ./client
         run: npm install --legacy-peer-deps
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('client/package-lock.json') }}
+
+      - name: Ensure Cypress binary installed
+        working-directory: ./client
+        run: npx cypress install
 
       - name: Run Cypress E2E Tests
         working-directory: ./client
