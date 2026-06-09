@@ -29,7 +29,7 @@ const InputQuantity = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (isNaN(parseInt(e.key))) {
+    if (Number.isNaN(Number.parseInt(e.key))) {
       e.preventDefault();
     }
   };
