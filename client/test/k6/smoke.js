@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-export default function () {
+export default function smokeTest() {
   const apiBaseUrl = __ENV.SERVER_BASE_URL;
   const frontendBaseUrl = __ENV.CLIENT_BASE_URL;
 

@@ -35,7 +35,7 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
           onClick={handleClose}
           onKeyDown={handleClose}
         >
-          <Link href="/">
+          <Link href="/" passHref>
             <a className={styles.link}>Home</a>
           </Link>
         </div>
@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
           onClick={handleClose}
           onKeyDown={handleClose}
         >
-          <Link href="/search?category=men">
+          <Link href="/search?category=men" passHref>
             <a className={styles.link}>Men</a>
           </Link>
         </div>
@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
           onClick={handleClose}
           onKeyDown={handleClose}
         >
-          <Link href="/search?category=women">
+          <Link href="/search?category=women" passHref>
             <a className={styles.link}>Women</a>
           </Link>
         </div>
@@ -76,7 +76,7 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
               onClick={handleClose}
               onKeyDown={handleClose}
             >
-              <Link href="/orders">
+              <Link href="/orders" passHref>
                 <a className={styles.link}>My Orders</a>
               </Link>
             </div>
@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
               onClick={handleClose}
               onKeyDown={handleClose}
             >
-              <Link href="/wishlist">
+              <Link href="/wishlist" passHref>
                 <a className={styles.link}>My Wishlist</a>
               </Link>
             </div>

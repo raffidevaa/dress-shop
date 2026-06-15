@@ -1,9 +1,10 @@
 import { rest } from 'msw';
 
+import { API_URL } from '@/constants';
 import { userGenerator } from '@/test/data-generators';
 
 export const authHandlers = [
-  rest.get(/.*\/auth\/me$/, (_, res, ctx) => {
+  rest.get(`${API_URL}/api/auth/me`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -14,7 +15,7 @@ export const authHandlers = [
       })
     );
   }),
-  rest.post(/.*\/auth\/login$/, (_, res, ctx) => {
+  rest.post(`${API_URL}/api/auth/login`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -25,7 +26,7 @@ export const authHandlers = [
       })
     );
   }),
-  rest.post(/.*\/auth\/signup$/, (_, res, ctx) => {
+  rest.post(`${API_URL}/api/auth/signup`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -36,7 +37,7 @@ export const authHandlers = [
       })
     );
   }),
-  rest.post(/.*\/auth\/signUp$/, (_, res, ctx) => {
+  rest.post(`${API_URL}/api/auth/signUp`, (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({

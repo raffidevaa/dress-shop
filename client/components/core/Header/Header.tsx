@@ -11,7 +11,7 @@ const Header = () => {
     <>
       <header className={styles.header}>
         <ul className={styles.headerWrapper}>
-          <Link href="/">
+          <Link href="/" passHref>
             <a className={styles.siteTitle}>Dress</a>
           </Link>
           <div className={styles.headerRight}>

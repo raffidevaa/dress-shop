@@ -4,8 +4,8 @@ const CartSkeleton = () => {
   return (
     <div className={styles.skeletonContainer} aria-label="Cart loading">
       <div className={styles.pageHeading}></div>
-      {[...Array(3)].map((_, i) => (
-        <div className="container" key={i}>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div className="container" key={i} data-testid="skeleton-item">
           <div style={{ display: 'flex', width: '20rem' }}>
             <div className={styles.box}></div>
           </div>

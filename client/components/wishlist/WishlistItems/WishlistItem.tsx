@@ -37,7 +37,7 @@ const WishlistItem = ({ wishlistItem }: Props) => {
 
   return (
     <div className={classNames(styles.wishlistItemContainer, removing ? styles.removing : '')}>
-      <Link href={`/products/${wishlistItem.product._id}`}>
+      <Link href={`/products/${wishlistItem.product._id}`} passHref>
         <a>
           <div className={styles.mediaContainer}>
             <Image

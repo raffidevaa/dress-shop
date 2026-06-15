@@ -13,8 +13,7 @@ const Spinner = ({ color = colors.primary, size = 30 }: Props) => {
   const sizeStyle = `${size}px`;
 
   return (
-    <div
-      role="status"
+    <output
       className={styles.loader}
       style={{ width: sizeStyle, height: sizeStyle, borderLeftColor: color }}
     />

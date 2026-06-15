@@ -14,7 +14,7 @@ const Login = () => {
         <LoginForm />
         <div className={styles.link}>
           Don{`'`}t have an account?
-          <Link href="/signup">
+          <Link href="/signup" passHref>
             <a className={`${styles.link} ${styles.linkText}`}> Create an account.</a>
           </Link>
           <div className={styles.or}>

@@ -24,7 +24,9 @@ const CartItem = ({ cartItem }: Props) => {
   const [qty, setQty] = useState<string | number>(cartItem.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const total = formatPrice(parseFloat((cartItem.product.price * cartItem.quantity).toFixed(2)));
+  const total = formatPrice(
+    Number.parseFloat((cartItem.product.price * cartItem.quantity).toFixed(2))
+  );
 
   const handleRemoveCart = async () => {
     try {
@@ -89,7 +91,7 @@ const CartItem = ({ cartItem }: Props) => {
     >
       <div className={styles.product}>
         <div className={styles.productImg}>
-          <Link href={`/products/${cartItem.product._id}`}>
+          <Link href={`/products/${cartItem.product._id}`} passHref>
             <a>
               <Image
                 src={cartItem.product.imageURL}

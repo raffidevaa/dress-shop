@@ -37,7 +37,7 @@ const Button = ({
   return (
     <>
       {href ? (
-        <Link href={href}>
+        <Link href={href} passHref>
           <a role="button" className={rootClassName} style={style}>
             {title}
           </a>

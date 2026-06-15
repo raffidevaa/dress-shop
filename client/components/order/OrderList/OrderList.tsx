@@ -30,14 +30,14 @@ const OrderList = () => {
             <li key={order._id} className={styles.list}>
               <div>
                 <div className={styles.date}>
-                  Date Ordered:
+                  Date Ordered:{' '}
                   <span className={styles.dateText}>{formatDate(order.createdAt)}</span>
                 </div>
                 <div className="products">
                   {order.items.map((order) => (
                     <div key={order.product._id} className={styles.productList}>
                       <div className={styles.productWrapper}>
-                        <Link href={`/products/${order.product._id}`}>
+                        <Link href={`/products/${order.product._id}`} passHref>
                           <a>
                             <Image
                               src={order.product.imageURL}
