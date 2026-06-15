@@ -6,13 +6,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui';
 import { useToast } from '@/contexts';
 import useRemoveItem from '@/hooks/wishlist/useRemoveItem';
+import { Product } from '@/types';
 import { WishlistItem as WishlistItemType } from '@/types/Wishlist';
 import formatPrice from '@/utils/formatPrice';
 
 import styles from './WishlistItem.module.css';
 
 interface Props {
-  wishlistItem: WishlistItemType;
+  wishlistItem: WishlistItemType & { product: Product };
 }
 
 const WishlistItem = ({ wishlistItem }: Props) => {
