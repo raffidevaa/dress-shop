@@ -1,6 +1,5 @@
 name: CI — Code Quality, Tests, and SonarCloud Analysis
 
-# warm-cache benchmark run
 on:
   push:
     paths:
@@ -15,7 +14,6 @@ concurrency:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast1
-  ARTIFACT_REPO: dress-shop-repo
 
 jobs:
 
@@ -28,7 +26,7 @@ jobs:
       workflow_changed: ${{ steps.workflow.outputs.any_changed }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -59,10 +57,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
@@ -84,7 +82,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: server/.eslintcache
-          key: ${{ runner.os }}-eslint-server-${{ github.sha }}
+          key: ${{ runner.os }}-eslint-server-${{ hashFiles('server/**/*.ts', 'server/.eslintrc*') }}
           restore-keys: ${{ runner.os }}-eslint-server-
 
       - name: Lint Server
@@ -98,10 +96,10 @@ jobs:
       needs.detect-changes.outputs.workflow_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js for Client
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
@@ -123,7 +121,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: client/.eslintcache
-          key: ${{ runner.os }}-eslint-client-${{ github.sha }}
+          key: ${{ runner.os }}-eslint-client-${{ hashFiles('client/**/*.ts', 'client/**/*.tsx', 'client/.eslintrc*') }}
           restore-keys: ${{ runner.os }}-eslint-client-
 
       - name: Lint Client
@@ -139,10 +137,10 @@ jobs:
       needs.detect-changes.outputs.server_changed == 'true' ||
       needs.detect-changes.outputs.workflow_changed == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js for Client Test
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
@@ -174,7 +172,7 @@ jobs:
         run: npm run test -- --coverage --coverageReporters=lcov --watchAll=false --forceExit --maxWorkers=2 --cacheDirectory=.jest-cache
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
           path: client/coverage/lcov.info
@@ -182,14 +180,13 @@ jobs:
   # SonarCloud Analysis
   sonarcloud:
     needs: [jest-test]
-    if: |
-      always() &&
-      (needs.jest-test.result == 'success' || needs.jest-test.result == 'skipped')
+    if: needs.jest-test.result == 'success'
+
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -201,7 +198,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Download coverage reports
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
           name: coverage-reports
           path: client/coverage
@@ -231,13 +228,14 @@ jobs:
       (needs.lint-client.result == 'success' || needs.lint-client.result == 'skipped') &&
       (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
       (needs.jest-test.result == 'success' || needs.jest-test.result == 'skipped')
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
@@ -248,19 +246,19 @@ jobs:
         uses: google-github-actions/setup-gcloud@v3
 
       - name: Configure Docker for GCR
-        run: gcloud auth configure-docker asia-southeast1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and Push Server Docker Image to GCR
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v4
         with:
           context: ./server
           push: true
           tags: |
-            asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:${{ github.sha }}
-            asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:latest
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:latest
           cache-from: type=gha,scope=server
           cache-to: type=gha,mode=max,scope=server
 
@@ -274,7 +272,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and Push Client Docker Image to GCR
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v4
         with:
           context: ./client
           push: true
@@ -283,7 +281,7 @@ jobs:
             NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.secrets.outputs.google_client_id }}
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ steps.secrets.outputs.stripe_publishable_key }}
           tags: |
-            asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:${{ github.sha }}
-            asia-southeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:latest
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:latest
           cache-from: type=gha,scope=client
           cache-to: type=gha,mode=max,scope=client
