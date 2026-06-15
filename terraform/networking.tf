@@ -12,7 +12,7 @@ resource "google_compute_region_network_endpoint_group" "client_neg" {
   network_endpoint_type = "SERVERLESS"
   region                = var.REGION
   cloud_run {
-    service = "dress-shop-client"
+    service = "dress-shop-client-production"
   }
 }
 
@@ -22,7 +22,7 @@ resource "google_compute_region_network_endpoint_group" "server_neg" {
   network_endpoint_type = "SERVERLESS"
   region                = var.REGION
   cloud_run {
-    service = "dress-shop-server"
+    service = "dress-shop-server-production"
   }
 }
 

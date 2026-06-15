@@ -26,6 +26,34 @@ resource "google_secret_manager_secret_iam_member" "api_url_access" {
   member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 }
 
+# Secret Manager for Staging Database URI
+resource "google_secret_manager_secret" "mongodb_uri_staging" {
+  secret_id = "DATABASE_URI_STAGING"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "mongodb_uri_staging_access" {
+  secret_id = google_secret_manager_secret.mongodb_uri_staging.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+}
+
+# Secret Manager for Staging Next.js API URL
+resource "google_secret_manager_secret" "api_url_staging" {
+  secret_id = "NEXT_PUBLIC_API_URL_STAGING"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "api_url_staging_access" {
+  secret_id = google_secret_manager_secret.api_url_staging.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+}
+
 # Secret Manager for Discord Webhook URLs
 resource "google_secret_manager_secret" "discord_webhooks" {
   for_each  = toset(["alerts", "errors", "uptime"])

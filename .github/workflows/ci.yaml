@@ -302,27 +302,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Server Docker Image to GCR
+      - name: Build and Push Staging Server Docker Image to GCR
         uses: docker/build-push-action@v4
         with:
           context: ./server
           push: true
           tags: |
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:latest
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/server:${{ github.sha }}-staging
           cache-from: type=gha,scope=server
           cache-to: type=gha,mode=max,scope=server
 
-      - name: Fetch client build secrets
+      - name: Fetch staging client build secrets
         id: secrets
         run: |
           {
-            echo "api_url=$(gcloud secrets versions access latest --secret=NEXT_PUBLIC_API_URL)"
+            echo "api_url=$(gcloud secrets versions access latest --secret=NEXT_PUBLIC_API_URL_STAGING)"
             echo "google_client_id=$(gcloud secrets versions access latest --secret=GOOGLE_WEB_CLIENT_ID)"
             echo "stripe_publishable_key=$(gcloud secrets versions access latest --secret=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Build and Push Client Docker Image to GCR
+      - name: Build and Push Staging Client Docker Image to GCR
         uses: docker/build-push-action@v4
         with:
           context: ./client
@@ -332,7 +331,6 @@ jobs:
             NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.secrets.outputs.google_client_id }}
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ steps.secrets.outputs.stripe_publishable_key }}
           tags: |
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:latest
-          cache-from: type=gha,scope=client
-          cache-to: type=gha,mode=max,scope=client
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/dress-shop/client:${{ github.sha }}-staging
+          cache-from: type=gha,scope=client-staging
+          cache-to: type=gha,mode=max,scope=client-staging
