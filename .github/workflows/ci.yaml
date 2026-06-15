@@ -47,13 +47,46 @@ jobs:
         with:
           files: |
             .github/workflows/**
+  
+  detect-comment-only:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+
+    outputs:
+      comment_only: ${{ steps.check.outputs.comment_only }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate diff
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            git diff HEAD^ HEAD > changes.diff 2>/dev/null || git show HEAD > changes.diff
+          else
+            git diff "${{ github.event.before }}" "${{ github.sha }}" > changes.diff
+          fi
+
+      - name: Check comment-only changes
+        id: check
+        run: |
+          python .github/scripts/check_comment_only.py changes.diff >> $GITHUB_OUTPUT
+
 
   # Install Dependencies and Code Quality Check (Linting)
   lint-server:
-    needs: detect-changes
+    needs:
+      - detect-changes
+      - detect-comment-only
+
     if: |
-      needs.detect-changes.outputs.server_changed == 'true' || 
-      needs.detect-changes.outputs.workflow_changed == 'true'
+      (
+        needs.detect-changes.outputs.server_changed == 'true' ||
+        needs.detect-changes.outputs.workflow_changed == 'true'
+      ) &&
+      needs.detect-comment-only.outputs.comment_only != 'true'
+
     runs-on: ubuntu-latest
 
     steps:
@@ -90,11 +123,19 @@ jobs:
         run: npx eslint . --cache --cache-location .eslintcache
 
   lint-client:
-    needs: detect-changes
+    needs:
+      - detect-changes
+      - detect-comment-only
+
     if: |
-      needs.detect-changes.outputs.client_changed == 'true' || 
-      needs.detect-changes.outputs.workflow_changed == 'true'
+      (
+        needs.detect-changes.outputs.client_changed == 'true' ||
+        needs.detect-changes.outputs.workflow_changed == 'true'
+      ) &&
+      needs.detect-comment-only.outputs.comment_only != 'true'
+          
     runs-on: ubuntu-latest
+  
     steps:
       - uses: actions/checkout@v4
 
@@ -130,12 +171,20 @@ jobs:
 
   # Jest Unit Tests
   jest-test:
-    needs: detect-changes
-    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - detect-comment-only
+
     if: |
-      needs.detect-changes.outputs.client_changed == 'true' ||
-      needs.detect-changes.outputs.server_changed == 'true' ||
-      needs.detect-changes.outputs.workflow_changed == 'true'
+      (
+        needs.detect-changes.outputs.client_changed == 'true' ||
+        needs.detect-changes.outputs.server_changed == 'true' ||
+        needs.detect-changes.outputs.workflow_changed == 'true'
+      ) &&
+      needs.detect-comment-only.outputs.comment_only != 'true'
+
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -226,8 +275,8 @@ jobs:
       always() &&
       (needs.lint-server.result == 'success' || needs.lint-server.result == 'skipped') &&
       (needs.lint-client.result == 'success' || needs.lint-client.result == 'skipped') &&
-      (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') &&
-      (needs.jest-test.result == 'success' || needs.jest-test.result == 'skipped')
+      (needs.sonarcloud.result == 'success') &&
+      (needs.jest-test.result == 'success')
 
     runs-on: ubuntu-latest
     permissions:
