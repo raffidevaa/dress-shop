@@ -2,6 +2,8 @@ name: CI — Code Quality, Tests, and SonarCloud Analysis
 
 on:
   push:
+    branches:
+      - main
     paths:
     - 'client/**'
     - 'server/**'
