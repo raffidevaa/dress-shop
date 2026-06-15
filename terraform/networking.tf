@@ -8,21 +8,29 @@ resource "google_compute_managed_ssl_certificate" "default" {
 
 # Serverless NEG for Client
 resource "google_compute_region_network_endpoint_group" "client_neg" {
-  name                  = "client-neg"
+  name                  = "client-neg-prod"
   network_endpoint_type = "SERVERLESS"
   region                = var.REGION
   cloud_run {
     service = "dress-shop-client-production"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Serverless NEG for Server
 resource "google_compute_region_network_endpoint_group" "server_neg" {
-  name                  = "server-neg"
+  name                  = "server-neg-prod"
   network_endpoint_type = "SERVERLESS"
   region                = var.REGION
   cloud_run {
     service = "dress-shop-server-production"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
