@@ -4,7 +4,7 @@ import Router from 'next/router';
 import React, { useState } from 'react';
 
 import { Meta, MobileBottomMenu } from '@/components/core';
-import { ProductList, ProductInputQuantity } from '@/components/product';
+import { ProductList, ProductInputQuantity, RecentlyViewedSection } from '@/components/product';
 import { PopUp, Container, Heading, ErrorMessage, Button } from '@/components/ui';
 import WishlistButton from '@/components/wishlist/WishlistButton';
 import { CACHE_REVALIDATION } from '@/constants';
@@ -13,6 +13,7 @@ import { usePopUp } from '@/hooks';
 import useAddItem from '@/hooks/cart/useAddItem';
 import useUser from '@/hooks/user/useUser';
 import ProductService from '@/services/ProductService';
+import RecentlyViewedService from '@/services/RecentlyViewedService';
 import styles from '@/styles/Product.module.css';
 import { Product as ProductTypes } from '@/types';
 import formatPrice from '@/utils/formatPrice';
@@ -29,6 +30,12 @@ const Product = ({ product, relatedProducts, error }: Props) => {
   const { data: currentUser } = useUser();
   const { isOpen, showToast } = usePopUp();
   const { setToast } = useToast();
+
+  React.useEffect(() => {
+    if (product) {
+      RecentlyViewedService.addToRecentlyViewed(product, !!currentUser);
+    }
+  }, [product, currentUser]);
 
   const handleChangeInputQty = (value: string | number) => {
     if (Number(value) > 10) {
@@ -120,6 +127,7 @@ const Product = ({ product, relatedProducts, error }: Props) => {
         </div>
         <Heading> Related Products </Heading>
         <ProductList products={relatedProducts} />
+        <RecentlyViewedSection />
       </Container>
       <MobileBottomMenu />
     </>

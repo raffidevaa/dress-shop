@@ -2,7 +2,9 @@ import 'dotenv/config';
 import { Product } from '../src/models/Product';
 import { Category } from '../src/models/Category';
 import { Banner } from '../src/models/Banner';
+import { User } from '../src/models/User';
 import { connectDb } from '../src/database';
+import { Role } from '../src/types';
 
 const u = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=800&h=800&fit=crop&auto=format&q=80`;
@@ -19,6 +21,21 @@ const seedBanners = [
     description: "Discover timeless styles in our men's collection.",
   },
 ];
+
+const seedUser = [
+  {
+    name: 'admin',
+    email: 'admin123@gmail.com',
+    password: 'admin123',
+    role: Role.Admin,
+  },
+  {
+    name: 'user',
+    email: 'user123@gmail.com',
+    password: 'user123',
+    role: Role.User,
+  },
+]
 
 const seedCategories = [
   {
@@ -128,6 +145,7 @@ const seed = async () => {
     await Banner.deleteMany({});
     await Category.deleteMany({});
     await Product.deleteMany({});
+    await User.deleteMany({});
     console.log('Old data cleared');
 
     await Banner.insertMany(seedBanners);
@@ -138,6 +156,9 @@ const seed = async () => {
 
     await Product.insertMany(seedProducts);
     console.log('Products seeded successfully');
+
+    await User.create(...seedUser);
+    console.log('Users seeded successfully');
 
     process.exit(0);
   } catch (error) {
