@@ -2,6 +2,7 @@ import { userGenerator } from '../../test/data-generators';
 
 describe('Critical User Journey', () => {
   const user = userGenerator();
+  let productUrl: string;
 
   it('should allow user to sign up', () => {
     cy.visit('/');
@@ -21,9 +22,32 @@ describe('Critical User Journey', () => {
 
     cy.findByText(/blue jeans/i).click();
     cy.wait(2000);
+
+    cy.url().then((url) => { productUrl = url; });
+  });
+
+  it('should allow user to add a product to wishlist', () => {
+    cy.get('[class*="productInfo"] [class*="wishlistButtonContainer"] button')
+      .click()
+      .should('not.be.disabled');
+
+    cy.visit('/wishlist');
+    cy.wait(2000);
+
+    cy.get('[class*="wishlistItemContainer"]').should('have.length.at.least', 1);
+  });
+
+  it('should allow user to remove a product from wishlist', () => {
+    cy.findByText(/remove/i).first().click();
+    cy.wait(2000);
+
+    cy.findByText(/wishlist is empty/i).should('exist');
   });
 
   it('should should allow user to add product to cart', () => {
+    cy.visit(productUrl);
+    cy.wait(2000);
+
     cy.findByRole('button', { name: /add to cart/i }).click();
     cy.findByText('Successfully added to cart').should('exist');
 
