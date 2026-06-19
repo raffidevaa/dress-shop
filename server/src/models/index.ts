@@ -1,3 +1,4 @@
+export * from './RecentlyViewed';
 export * from './Banner';
 export * from './Cart';
 export * from './Category';

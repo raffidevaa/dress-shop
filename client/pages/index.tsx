@@ -3,6 +3,7 @@ import { InferGetStaticPropsType } from 'next';
 import { Categories } from '@/components/category';
 import { Meta, MobileBottomMenu } from '@/components/core';
 import { ProductOverviewSection } from '@/components/home';
+import { RecentlyViewedSection } from '@/components/product';
 import { Banners, Container, Heading } from '@/components/ui';
 import { useScrollRestoration } from '@/hooks';
 import BannerService from '@/services/BannerService';
@@ -24,6 +25,7 @@ const Home = ({
         <Heading>Categories</Heading>
         <Categories categories={categories} />
         <ProductOverviewSection initialProducts={products} />
+        <RecentlyViewedSection />
       </Container>
       <MobileBottomMenu />
     </>

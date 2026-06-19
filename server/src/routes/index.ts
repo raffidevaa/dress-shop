@@ -1,3 +1,4 @@
+export * from './recentlyViewedRoutes';
 export * from './authRoutes';
 export * from './productRoutes';
 export * from './cartRoutes';

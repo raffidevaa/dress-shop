@@ -14,6 +14,7 @@ import {
   userRoutes,
   dashboardRoutes,
   wishlistRoutes,
+  recentlyViewedRoutes,
   healthRoutes,
 } from "./routes";
 import { PORT } from "./config";
@@ -39,6 +40,7 @@ const start = async () => {
   app.use("/api/banners", bannerRoutes);
   app.use("/api/categories", categoryRoutes);
   app.use("/api/wishlist", wishlistRoutes);
+  app.use("/api/recently-viewed", recentlyViewedRoutes);
   app.use("/api/cart", cartRoutes);
   app.use("/api/checkout", checkOutRoutes);
   app.use("/api/orders", orderRoutes);

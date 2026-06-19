@@ -32,7 +32,7 @@ const UserSchema = new Schema<UserDocument>(
 UserSchema.pre<UserDocument>('save', async function () {
   if (this.isModified('password')) {
     if (this.password) {
-      const hash = await bcrypt.hashSync(this.password.toString(), 10);
+      const hash = await bcrypt.hash(this.password.toString(), 10);
       this.password = hash;
     }
   }
