@@ -95,179 +95,156 @@ vercel --prod
 
 ## GitHub Workflows Documentation
 
-Dokumentasi lengkap tentang tiga file workflow GitHub Actions yang digunakan untuk CI/CD dan Infrastructure Deployment dalam proyek Dress Shop.
-
-### Infrastructure Deployment (infra-deploy.yaml)
-
-**Tujuan:** Mengelola infrastruktur cloud menggunakan Terraform.
-
-**Trigger:** Berjalan saat ada push/PR ke branch `main` dengan perubahan di folder `terraform/`.
-
-**Step-by-Step:**
-
-1. **Checkout** - Mengambil kode dari repository
-2. **Setup Terraform** - Menginstal Terraform versi 1.7.0
-3. **Terraform Init** - Menginisialisasi working directory Terraform, download provider plugins, dan setup backend
-4. **Terraform Format Check** - Memeriksa format file Terraform dan memastikan konsistensi kode
-5. **Terraform Plan** - Membuat rencana perubahan infrastruktur, menampilkan apa yang akan ditambah/diubah/dihapus. Output disimpan ke file `tfplan`
-6. **Terraform Apply** - Menerapkan perubahan infrastruktur ke cloud (hanya berjalan untuk push ke main, bukan untuk PR)
-
-**Used Environment Variables:**
-```
-TF_VAR_PROJECT_ID      - GCP Project ID
-TF_VAR_PROJECT_NUMBER  - GCP Project Number
-TF_VAR_REGION          - Region cloud (asia-southeast1)
-TF_VAR_DOMAIN          - Domain name
-GOOGLE_CREDENTIALS     - GCP credentials JSON
-```
+Documentation for GitHub Actions workflows used for CI/CD, staging, production, Discord Bridge, and Infrastructure in the Dress Shop project.
 
 ---
 
-### CI - Code Quality & Tests (ci.yaml)
+### 1. CI — Code Quality, Tests, and SonarCloud Analysis (`ci.yaml`)
 
-**Tujuan:** Menjalankan quality checks, unit tests, dan analisis code security menggunakan SonarCloud.
+**Trigger:** Every push that changes files in `client/`, `server/`, or `.github/workflows/`.
 
-**Trigger:** Setiap kali ada push ke branch `main`.
+This workflow first runs a `detect-changes` job to determine which folders were modified, then runs the following jobs conditionally based on the result.
 
-#### Job 1: Code Quality (Linting)
+#### Job: `lint-server`
+Runs if there are changes in `server/`.
+1. Install server dependencies
+2. Run ESLint with cache
 
-1. **Checkout Code** - Mengambil kode terbaru dari repository
-2. **Install Server Dependencies** - Menginstal dependencies server dari `server/package.json`
-3. **Lint Server** - Menjalankan ESLint untuk code server, memeriksa style guide dan potential bugs
-4. **Install Client Dependencies** - Menginstal dependencies client dari `client/package.json` dengan flag `--legacy-peer-deps` untuk mengatasi peer dependency conflicts
-5. **Lint Client** - Menjalankan ESLint untuk code client
+#### Job: `lint-client`
+Runs if there are changes in `client/`.
+1. Install client dependencies
+2. Run Next.js ESLint with cache
 
-#### Job 2: Jest Unit Tests
+#### Job: `jest-test`
+Runs if there are changes in `client/` or `server/`.
+1. Install client dependencies
+2. Run Jest with coverage report (lcov format)
+3. Upload coverage report as an artifact
 
-**Kondisi:** Hanya berjalan jika `code-quality` job berhasil.
+#### Job: `sonarcloud`
+Runs after `jest-test` succeeds.
+1. Download coverage artifact from `jest-test`
+2. Send code and coverage to SonarCloud for quality and security analysis
 
-1. **Install Client Dependencies** - Menginstal ulang dependencies client
-2. **Run Jest** - Menjalankan semua test cases di client dengan flags:
-   - `--coverage` - Generate coverage report
-   - `--coverageReporters=lcov` - Format laporan untuk SonarCloud
-   - `--watchAll=false` - Tidak menunggu perubahan file
-   - `--forceExit` - Keluar setelah test selesai
-3. **Upload Coverage Reports** - Menyimpan coverage reports sebagai artifacts untuk digunakan oleh job `sonarcloud`
-
-#### Job 3: SonarCloud Analysis
-
-**Kondisi:** Hanya berjalan jika `jest-test` job berhasil.
-
-1. **Checkout Code** - Mengambil kode dengan `fetch-depth: 0` untuk semua git history
-2. **Download Coverage Reports** - Mengambil coverage reports dari job `jest-test`
-3. **Scan with SonarCloud** - Mengirim kode dan coverage reports ke SonarCloud untuk:
-   - Analisis code quality
-   - Security vulnerability scanning
-   - Code duplication detection
-   - Coverage metrics analysis
-
-#### Job 4: Build and Push Docker Images
-
-**Kondisi:** Hanya berjalan jika `sonarcloud` job berhasil.
-
-1. **Authenticate to Google Cloud** - Login ke GCP menggunakan credentials
-2. **Set up Cloud SDK** - Menginstal Google Cloud SDK
-3. **Configure Docker for GCR** - Konfigurasi Docker untuk push ke Google Artifact Registry (asia-southeast1)
-4. **Build and Push Server Image** - Build Docker image server dari `server/` dan push ke registry dengan tags:
-   - Commit SHA (untuk versioning)
-   - `latest` (untuk latest release)
-5. **Build and Push Client Image** - Fetch secret `NEXT_PUBLIC_API_URL` dari GCP Secret Manager, build image client dengan environment variable ini, dan push ke registry
-
-**Used Secrets:**
-```
-GCP_PROJECT_ID          - GCP Project ID
-GCP_CREDENTIALS         - GCP Service Account JSON
-SONAR_TOKEN             - SonarCloud authentication token
-SONAR_PROJECT_KEY       - SonarCloud project key
-SONAR_ORGANIZATION_KEY  - SonarCloud organization key
-NEXT_PUBLIC_API_URL     - API endpoint untuk client
-```
+#### Job: `build-and-push`
+Runs after all jobs above succeed (lint jobs may be skipped, but sonar and jest must pass).
+1. Authenticate to Google Cloud and configure Docker for Artifact Registry
+2. Build and push server Docker image with tag `:sha-staging`
+3. Fetch `NEXT_PUBLIC_API_URL_STAGING`, `GOOGLE_WEB_CLIENT_ID`, and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` from GCP Secret Manager
+4. Build and push client Docker image using those secrets as build args, with tag `:sha-staging`
 
 ---
 
-### CD - Direct Deploy to Cloud Run (cd.yaml)
+### 2. Build & Push Production Images (`build-push-prod.yaml`)
 
-**Tujuan:** Melakukan deployment ke Google Cloud Run setelah CI workflow berhasil.
+**Trigger:** After the CI workflow completes successfully (runs in parallel with `cd.yaml`).
 
-**Trigger:** Setelah workflow `ci.yaml` selesai (berhasil atau gagal).
+#### Job: `build-prod`
+1. Authenticate to Google Cloud and configure Docker for Artifact Registry
+2. Build and push server Docker image with tag `:sha-production`
+3. Fetch `NEXT_PUBLIC_API_URL`, `GOOGLE_WEB_CLIENT_ID`, and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` from GCP Secret Manager
+4. Build and push client Docker image using those production secrets as build args, with tag `:sha-production`
 
-#### Deploy Job
+---
 
-1. **Checkout Code** - Mengambil kode terbaru
-2. **Authenticate to Google Cloud** - Login ke GCP menggunakan credentials
-3. **Set up Cloud SDK** - Menginstal gcloud CLI tools
-4. **Verify Server Image Exists** - Memastikan Docker image server sudah di-push ke GCR menggunakan commit SHA
-5. **Deploy Server to Cloud Run** - Deploy server dengan konfigurasi:
-   - Region: asia-southeast1
-   - Platform: managed
-   - Allow unauthenticated access
-   - Port: 8080
-   - Memory: 512Mi, CPU: 1
-   - Scaling: 0-10 instances
-   - Environment: NODE_ENV=production
-   - Secrets: DATABASE_URI dari Secret Manager
-6. **Verify Client Image Exists** - Memastikan Docker image client sudah di-push
-7. **Deploy Client to Cloud Run** - Deploy client dengan konfigurasi serupa server (tanpa secrets)
-8. **Print Service URLs** - Menampilkan URL service yang baru di-deploy
-9. **Deploy Discord Bridge Cloud Function** - Deploy Cloud Function Gen 2 dengan:
-   - Runtime: Node.js 22
-   - Source: `server/functions/discord-bridge`
-   - Trigger: HTTP
-   - Secrets: Discord webhooks (alerts, errors, uptime)
+### 3. CD — Deploy Staging & Test (`cd.yaml`)
 
-#### Post-Deployment Tests Job
+**Trigger:** After the CI workflow completes successfully.
 
-**Kondisi:** Hanya berjalan setelah `deploy` job berhasil.
+#### Job: `deploy`
+1. Authenticate to Google Cloud
+2. Verify server and client images with tag `:sha-staging` exist in Artifact Registry (retry 3x)
+3. Deploy `dress-shop-server-staging` and `dress-shop-client-staging` to Cloud Run in parallel with the following config:
+   - Region: `asia-southeast1`, port: `8080`, scaling: 0–3 instances
+   - Server: memory 1Gi, env `NODE_ENV=staging`, secrets `DATABASE_URI_STAGING`, `GOOGLE_CLIENT_SECRET`, `STRIPE_SECRET_API_KEY`
+   - Client: memory 512Mi, env `NODE_ENV=staging`
+4. Capture and store staging service URLs as outputs
 
-1. **Checkout Code** - Mengambil kode repository
-2. **Setup k6** - Menginstal k6 untuk load testing
-3. **Run k6 Smoke Tests** - Menjalankan smoke tests dari `k6/smoke-test.js` untuk validasi basic functionality
-4. **Setup Node.js** - Menginstal Node.js versi 18
-5. **Install Client Dependencies** - Menginstal dependencies client
-6. **Run Cypress E2E Tests** - Menjalankan end-to-end tests dengan Cypress untuk validasi user workflows
+#### Job: `smoke-test`
+Runs after `deploy` succeeds.
+1. Install k6
+2. Run smoke tests (`client/test/k6/smoke.js`) against the staging URLs
 
-**Used Secrets:**
-```
-GCP_PROJECT_ID              - GCP Project ID
-GCP_CREDENTIALS             - GCP Service Account JSON
-DATABASE_URI                - Database connection string
-DISCORD_WEBHOOK_ALERTS      - Discord webhook untuk alerts
-DISCORD_WEBHOOK_ERRORS      - Discord webhook untuk errors
-DISCORD_WEBHOOK_UPTIME      - Discord webhook untuk uptime
-```
+#### Job: `e2e-test`
+Runs after `smoke-test` succeeds.
+1. Install client dependencies and Cypress binary
+2. Run Cypress E2E tests against the staging client URL
+
+---
+
+### 4. CD — Deploy Production (`cd-prod.yaml`)
+
+**Trigger:** After the CD Staging workflow completes successfully (staging smoke tests and E2E tests passed).
+
+#### Job: `deploy-prod`
+1. Authenticate to Google Cloud
+2. Verify server and client images with tag `:sha-production` exist in Artifact Registry (retry 3x)
+3. Deploy `dress-shop-server-production` and `dress-shop-client-production` to Cloud Run in parallel with the following config:
+   - Region: `asia-southeast1`, port: `8080`, scaling: 0–10 instances
+   - Server: memory 1Gi, env `NODE_ENV=production`, secrets `DATABASE_URI`, `GOOGLE_CLIENT_SECRET`, `STRIPE_SECRET_API_KEY`
+   - Client: memory 512Mi, env `NODE_ENV=production`
+4. Print the deployed production service URLs
+
+---
+
+### 5. Deploy Discord Bridge Function (`discord-bridge-deploy.yaml`)
+
+**Trigger:** Push to `main` that changes files in `server/functions/discord-bridge/`, or triggered manually.
+
+#### Job: `deploy-function`
+1. Authenticate to Google Cloud
+2. Deploy Gen 2 Cloud Function `discord-bridge` with the following config:
+   - Runtime: Node.js 22, region: `asia-southeast1`
+   - Entry point: `discordBridge`, trigger: HTTP
+   - Secrets: `DISCORD_WEBHOOK_ALERTS`, `DISCORD_WEBHOOK_ERRORS`, `DISCORD_WEBHOOK_UPTIME`
+
+---
+
+### 6. Infrastructure Deployment (`infra-deploy.yaml`)
+
+**Trigger:** Push or PR to `main` that changes files in `terraform/`, or triggered manually.
+
+#### Job: `terraform`
+1. Set up Terraform version 1.7.0
+2. `terraform init` — initialize GCS backend and download providers
+3. `terraform fmt -check` — validate file formatting
+4. `terraform plan` — generate an infrastructure change plan, saved to `tfplan`
+5. `terraform apply` — apply the changes (only on push to `main`, not on PRs)
 
 ---
 
 ### Overall Flow
 
-**Development Cycle Complete:**
-
 ```
-Developer Push Code
+Push to client/ or server/
         ↓
-[CI WORKFLOW - ci.yaml]
-  ├─ Code Quality Check (Linting)
-  ├─ Unit Tests (Jest)
-  ├─ SonarCloud Analysis
-  └─ Build & Push Docker Images
+[ci.yaml]
+  ├─ detect-changes
+  ├─ lint-server & lint-client (parallel)
+  ├─ jest-test
+  ├─ sonarcloud
+  └─ build-and-push (image :sha-staging)
         ↓
-    (CI Success?)
-        ├─ YES → [CD WORKFLOW - cd.yaml]
-        │         ├─ Deploy Server to Cloud Run
-        │         ├─ Deploy Client to Cloud Run
-        │         ├─ Deploy Discord Bridge Function
-        │         ├─ Print Service URLs
-        │         └─ Post-Deployment Tests
-        │             ├─ k6 Smoke Tests
-        │             └─ Cypress E2E Tests
-        │
-        └─ NO → Stop (Notify Developer)
+    CI passed?
+        ├─ YES → [cd.yaml] — Deploy Staging & Test        [build-push-prod.yaml]
+        │         ├─ deploy staging (server & client)       └─ build & push image :sha-production
+        │         ├─ smoke-test k6 (staging)                     (runs in parallel with cd.yaml)
+        │         └─ e2e-test Cypress (staging)
+        │               ↓
+        │           Staging passed?
+        │               ├─ YES → [cd-prod.yaml] — Deploy Production
+        │               │         └─ deploy production (server & client)
+        │               └─ NO → Stop
+        └─ NO → Stop
 
-Terpisah: Infrastructure Changes
+Push to server/functions/discord-bridge/
         ↓
-  [INFRA WORKFLOW - infra-deploy.yaml]
-  ├─ Terraform Init
-  ├─ Format Check
-  ├─ Terraform Plan
-  └─ Terraform Apply (on main push only)
+[discord-bridge-deploy.yaml]
+  └─ deploy discord-bridge Cloud Function
+
+Push/PR to terraform/
+        ↓
+[infra-deploy.yaml]
+  ├─ terraform plan (PR)
+  └─ terraform apply (push to main)
 ```
