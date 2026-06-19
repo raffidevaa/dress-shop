@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { addRecentlyViewed, getRecentlyViewed } from '../controllers/recentlyViewedController';
 import { RecentlyViewed } from '../models';
+import { Role, User } from '../types';
 
 jest.mock('../models', () => ({
   RecentlyViewed: {
@@ -10,20 +11,42 @@ jest.mock('../models', () => ({
   },
 }));
 
+type MockRequest = Partial<Request> & {
+  user: User;
+  body: {
+    productId?: string;
+  };
+};
+
+type RecentlyViewedResponse = {
+  status?: string;
+  message?: string;
+  data?: {
+    recentlyViewed: Array<{ name: string }>;
+  };
+};
+
 describe('RecentlyViewed Controller', () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: MockRequest;
   let mockResponse: Partial<Response>;
-  let responseJson: Record<string, any>;
+  let responseJson: RecentlyViewedResponse;
 
   beforeEach(() => {
     mockRequest = {
-      user: { _id: 'user123' } as unknown as any,
+      user: {
+        _id: 'user123',
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password',
+        role: Role.User,
+        carts: [],
+      },
       body: { productId: 'prod123' },
     };
-    responseJson = {} as Record<string, any>;
+    responseJson = {};
     mockResponse = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockImplementation((result) => {
+      json: jest.fn().mockImplementation((result: RecentlyViewedResponse) => {
         responseJson = result;
       }),
     };
@@ -74,7 +97,7 @@ describe('RecentlyViewed Controller', () => {
       await getRecentlyViewed(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(responseJson.data.recentlyViewed).toHaveLength(2);
+      expect(responseJson.data?.recentlyViewed).toHaveLength(2);
     });
   });
 });
